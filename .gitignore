@@ -1,0 +1,48 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Maven (혹시 쓸 경우)
+target/
+
+# IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# VS Code
+.vscode/
+
+# 비밀 값 (DB 비밀번호, FCM 키 등은 절대 커밋하지 않기)
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+application-secret.yml
+*firebase*adminsdk*.json
+
+# logs / OS
+*.log
+logs/
+.DS_Store
+HELP.md

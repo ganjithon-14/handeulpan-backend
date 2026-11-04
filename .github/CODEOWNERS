@@ -1,0 +1,5 @@
+# PR을 열면 아래 팀에게 리뷰 요청이 자동으로 갑니다. (작성자 본인은 빠지고 같은 파트 다른 한 명에게)
+*             @ganjithon-14/backend
+
+# API 명세가 바뀌면 프론트도 같이 봅니다.
+/docs/api/    @ganjithon-14/backend @ganjithon-14/frontend
