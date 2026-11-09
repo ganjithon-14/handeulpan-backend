@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: handeulpan
+  profiles:
+    default: local
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
+
+server:
+  port: ${PORT:8080}
+
+---
+# 로컬 실행: 설치 없이 H2 인메모리 DB로 바로 뜹니다. (./gradlew bootRun)
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:handeulpan;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+
+---
+# 배포 서버: PostgreSQL 접속 정보는 환경변수로만 받습니다. (SPRING_PROFILES_ACTIVE=prod)
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
