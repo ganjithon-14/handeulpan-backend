@@ -1,7 +1,6 @@
 # 공통 규칙
 
-> 기준: 개발 명세(MVP) 4장. 경로·용어는 명세(`pasture`, `/api/sheep/...`)를 따릅니다.
-> 레포 초안(`field`, `/api/fields/...`)과 다른 부분은 [용어·경로 불일치](#용어경로-불일치-확인-필요)에 모아 두었습니다.
+> 기준: 개발 명세(MVP) 4장. 용어와 경로는 BE-A 코드(`pasture`, `CENTER` / `WALK` / `EDGE`, `/api/sheep/...`)를 따릅니다.
 
 ## 인증
 
@@ -46,15 +45,3 @@
 | 403 | `INVALID_DEMO_KEY` | 데모 API의 `X-Demo-Key`가 틀림 | BE-A |
 
 `PASTURE_FULL`, `ALREADY_JOINED`, `ALREADY_SENT_TODAY`, `SELF`는 명세에 있는 값이고, 나머지는 BE-B가 제안한 이름입니다.
-
-## 용어·경로 불일치 (확인 필요)
-
-| 항목 | 개발 명세 | 레포 초안 / 용어표 | 이 문서 |
-|---|---|---|---|
-| 들판 이름 | `pasture` | `field` | 명세 |
-| 거리 단계 | `CENTER` / `WALK` / `EDGE` | `CENTER` / `WANDERING` / `EDGE` | 명세 |
-| 말풍선 | `PUT /api/sheep/{id}/bubble` | `POST /api/fields/{fieldId}/bubble` | 명세 |
-| 목도리 보내기 | `POST /api/sheep/{id}/scarves` | `POST /api/fields/{fieldId}/sheep/{sheepId}/scarves` | 명세 |
-| 받은 목도리 목록 | 별도 API 없음 (들판 조회의 `myScarves`) | `GET /api/me/scarves` | 명세 |
-
-팀이 한쪽으로 정하면 이 표와 각 문서를 함께 고칩니다.
