@@ -15,6 +15,11 @@ spring:
 server:
   port: ${PORT:8080}
 
+# --- BE-A: 거리 규칙·데모 (기본값은 코드에 있음, 바꿀 때만 적기) ---
+handeulpan:
+  demo:
+    key: ${HANDEULPAN_DEMO_KEY:}
+
 ---
 # 로컬 실행: 설치 없이 H2 인메모리 DB로 바로 뜹니다. (./gradlew bootRun)
 spring:
@@ -30,6 +35,9 @@ spring:
       enabled: true
   jpa:
     show-sql: true
+handeulpan:
+  demo:
+    key: local-demo
 
 ---
 # 배포 서버: PostgreSQL 접속 정보는 환경변수로만 받습니다. (SPRING_PROFILES_ACTIVE=prod)
