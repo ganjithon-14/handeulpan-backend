@@ -5,8 +5,9 @@
 ## 공통
 
 - Base URL: `TBD`
-- 인증 헤더: `X-Device-Token: {UUID}` (이름은 확정 시 수정)
-- 공통 응답·에러 형식: BE-B가 확정 후 작성
+- 인증 헤더: `X-Device-Token: {UUID}`
+- 공통 응답·에러 형식·에러 코드: [common.md](common.md)
+- BE-B 담당 상세: [bubble.md](bubble.md), [scarf.md](scarf.md) (개발 명세 기준 경로)
 
 ## 엔드포인트 목록 (초안)
 
