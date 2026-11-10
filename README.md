@@ -16,13 +16,28 @@
 | 배포 | Railway 또는 EC2 |
 | 알림 (P1) | FCM 웹 푸시 |
 
-> 프로젝트 초기 세팅(Gradle·패키지 구조)은 BE-A가 이 레포에 올립니다.
+## 실행 방법
+
+| 항목 | 값 |
+|---|---|
+| Java | 21 |
+| Spring Boot | 4.1.2 |
+| 빌드 | Gradle 9.7 (wrapper 포함) |
+
+```bash
+./gradlew bootRun          # local 프로필: H2 인메모리 DB로 바로 실행 (http://localhost:8080)
+./gradlew build            # 컴파일 + 테스트
+```
+
+- `local`(기본): 설치 없이 H2로 뜹니다. H2 콘솔 `/h2-console`
+- `prod`: `SPRING_PROFILES_ACTIVE=prod` + 환경변수 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` (PostgreSQL)
+- 시간 기준은 `Clock` 빈(Asia/Seoul) 하나로 통일합니다. `LocalDateTime.now()` 대신 `Clock`을 주입받아 써 주세요.
 
 ## 담당 영역
 
 | 파트 | 담당 | 패키지 (제안) | 범위 |
 |---|---|---|---|
-| BE-A · 코어 | [@rohdaeyoung](https://github.com/rohdaeyoung) | `common`, `user`, `field`, `sheep`, `pat`, `demo` | 프로젝트 세팅, 사용자(기기 토큰)·들판·양 엔티티, 들판 생성·미리보기·합류·조회, 쓰다듬기, 상태 계산, 데모 되감기 |
+| BE-A · 코어 | [@rohdaeyoung](https://github.com/rohdaeyoung) | `common.config`, `user`, `pasture`, `sheep`, `demo` | 프로젝트 세팅, 사용자(기기 토큰)·들판·양 엔티티, 들판 생성·미리보기·합류·조회, 쓰다듬기, 상태 계산, 데모 되감기 |
 | BE-B · 돌봄·운영 | [@sinjuno](https://github.com/sinjuno) | `bubble`, `keyword`, `scarf`, `push`, `config`, 배포 설정 | 말풍선 API·위험 키워드 검사, 목도리 API, 서버·DB 배포, Swagger, 공통 응답·에러 형식, 시연용 시드 데이터, 프론트 연동 지원, P1(푸시·반응·낮잠) |
 
 패키지 이름은 [용어표](https://github.com/ganjithon-14/.github/blob/main/CONTRIBUTING.md#5-용어-코드-이름-통일)를 따릅니다.
