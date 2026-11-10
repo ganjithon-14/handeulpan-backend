@@ -31,6 +31,8 @@
 | 401 | `INVALID_DEVICE_TOKEN` | 토큰이 없거나 모르는 값 | 공통 |
 | 400 | `VALIDATION_FAILED` | 요청 형식이 잘못됨 (필수값 누락, 길이 초과 등) | 공통 |
 | 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류. 내부 메시지는 노출하지 않음 | 공통 |
+| 404 | `NOT_FOUND` | 없는 주소 | 공통 |
+| 405 | `METHOD_NOT_ALLOWED` | 그 주소가 지원하지 않는 HTTP 메서드 | 공통 |
 | 404 | `PASTURE_NOT_FOUND` | 없는 들판 | BE-A |
 | 404 | `SHEEP_NOT_FOUND` | 없는 양 | 공통 |
 | 403 | `NOT_PASTURE_MEMBER` | 그 들판의 멤버가 아님 | 공통 |
@@ -45,3 +47,9 @@
 | 403 | `INVALID_DEMO_KEY` | 데모 API의 `X-Demo-Key`가 틀림 | BE-A |
 
 `PASTURE_FULL`, `ALREADY_JOINED`, `ALREADY_SENT_TODAY`, `SELF`는 명세에 있는 값이고, 나머지는 BE-B가 제안한 이름입니다.
+
+## CORS
+
+- 브라우저(프론트)에서 호출할 수 있는 출처는 서버 환경변수 `CORS_ALLOWED_ORIGINS`로 정합니다. 쉼표로 여러 개를 적고 `https://*.vercel.app` 같은 와일드카드도 됩니다. 기본값은 `http://localhost:5173`입니다.
+- 허용 메서드는 GET, POST, PUT, DELETE이고, 허용 헤더는 `Content-Type`, `Accept`, `X-Device-Token`, `X-Demo-Key`입니다.
+- 인증이 쿠키가 아니라 헤더라서 `credentials`는 쓰지 않습니다. 프론트는 `fetch`에 `credentials: 'include'`를 넣지 마세요.

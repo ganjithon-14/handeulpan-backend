@@ -46,7 +46,7 @@
 
 - 11/6까지 [`docs/api/`](docs/api)에 요청·응답 예시 JSON을 고정하고, 프론트는 그 JSON으로 먼저 개발합니다.
 - `docs/api/`가 바뀌면 프론트 팀에도 리뷰 요청이 자동으로 갑니다.
-- 서버가 뜬 뒤에는 Swagger UI 주소를 여기에 적어 주세요: `TBD`
+- Swagger UI: 로컬 `http://localhost:8080/swagger-ui/index.html`, 배포 서버 `https://handeulpan.p-e.kr/swagger-ui/index.html` (배포 후 접속 가능). 오른쪽 위 Authorize에 `POST /api/users`로 받은 기기 토큰을 넣으면 됩니다.
 
 ## 브랜치
 
