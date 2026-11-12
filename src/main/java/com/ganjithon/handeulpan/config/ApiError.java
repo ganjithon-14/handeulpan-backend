@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 public enum ApiError {
 
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않아요."),
-    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "잠시 후 다시 시도해 주세요.");
+    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "잠시 후 다시 시도해 주세요."),
+
+    // 말풍선
+    BUBBLE_TEXT_INVALID(HttpStatus.BAD_REQUEST, "말풍선은 1~20자로 적어 주세요."),
+    BUBBLE_NOT_FOUND(HttpStatus.NOT_FOUND, "지울 말풍선이 없어요.");
 
     private final HttpStatus status;
     private final String message;

@@ -4,7 +4,8 @@
 
 ## 공통
 
-- Base URL: `TBD`
+- Base URL: `https://handeulpan.p-e.kr`
+- Swagger UI: `https://handeulpan.p-e.kr/swagger-ui/index.html`, OpenAPI 문서: `https://handeulpan.p-e.kr/v3/api-docs`
 - 인증 헤더: `X-Device-Token: {UUID}`
 - 공통 응답·에러 형식·에러 코드: [common.md](common.md)
 - BE-A 담당 상세: [pasture.md](pasture.md), [sheep.md](sheep.md), [demo.md](demo.md) (구현된 경로)
@@ -21,18 +22,22 @@
 | 들판 조회 (화면 전체) | GET | `/api/pastures/{pastureId}` | BE-A | 구현됨 |
 | 내 들판 목록 (홈) | GET | `/api/pastures` | BE-A | 구현됨 |
 | F2 쓰다듬기 | POST | `/api/sheep/{sheepId}/pat` | BE-A | 구현됨 |
-| F4 말풍선 쓰기 (위험 키워드 검사) | POST | `/api/fields/{fieldId}/bubble` | BE-B | 초안 |
+| F4 말풍선 올리기 (위험 키워드 검사) | PUT | `/api/sheep/{sheepId}/bubble` | BE-B | 구현됨 |
+| F4 말풍선 지우기 | DELETE | `/api/sheep/{sheepId}/bubble` | BE-B | 구현됨 |
 | F7 목도리 보내기 | POST | `/api/fields/{fieldId}/sheep/{sheepId}/scarves` | BE-B | 초안 |
 | F7 받은 목도리 목록·두르기 | GET / PATCH | `/api/me/scarves` | BE-B | 초안 |
 | D 데모 되감기 (`X-Demo-Key`) | POST | `/api/demo/sheep/{sheepId}/rewind` | BE-A | 구현됨 |
 
-경로는 예시입니다. 확정되면 아래처럼 파일을 하나씩 추가해 주세요.
+말풍선·목도리의 경로는 구현하면서 확정합니다. (목도리 줄은 아직 초안)
+
+## 상세 문서
 
 ```
 docs/api/
-  fields.md     # F1, 들판 조회
-  pat.md        # F2
-  bubble.md     # F4
-  scarf.md      # F7
-  demo.md       # D
+  common.md     # 인증·에러 형식·에러 코드
+  pasture.md    # 기기 토큰, F1 들판, 들판 조회
+  sheep.md      # F2 쓰다듬기
+  bubble.md     # F4 말풍선
+  scarf.md      # F7 목도리
+  demo.md       # D 데모 되감기
 ```
