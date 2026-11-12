@@ -6,7 +6,8 @@
 
 - 모든 요청에 헤더 `X-Device-Token: {UUID}`를 보냅니다.
 - 토큰이 없으면 `POST /api/users`로 발급받아 브라우저에 저장합니다. (BE-A 담당)
-- 토큰이 곧 사용자입니다. 로그인, 비밀번호, JWT는 쓰지 않습니다.
+- 토큰이 곧 사용자입니다. JWT는 쓰지 않습니다.
+- 아이디·비밀번호 가입은 선택입니다. 가입하면 기기를 바꿔도 로그인해서 같은 양·들판으로 돌아옵니다. → [auth.md](auth.md)
 - 헤더가 없거나 등록되지 않은 토큰이면 `401 INVALID_DEVICE_TOKEN`.
 
 ## 응답 형식
@@ -45,6 +46,9 @@
 | 400 | `SELF` | 자기 자신에게 목도리를 보내려 함 | BE-B |
 | 404 | `SCARF_NOT_FOUND` | 내가 받은 목도리가 아님 | BE-B |
 | 403 | `INVALID_DEMO_KEY` | 데모 API의 `X-Demo-Key`가 틀림 | BE-A |
+| 409 | `DUPLICATE_USERNAME` | 이미 쓰는 아이디로 가입 | BE-B |
+| 401 | `INVALID_CREDENTIALS` | 로그인 아이디가 없거나 비밀번호가 틀림 | BE-B |
+| 409 | `ALREADY_HAS_ACCOUNT` | 이미 계정이 있는 사용자가 다시 가입 | BE-B |
 
 `PASTURE_FULL`, `ALREADY_JOINED`, `ALREADY_SENT_TODAY`, `SELF`는 명세에 있는 값이고, 나머지는 BE-B가 제안한 이름입니다.
 

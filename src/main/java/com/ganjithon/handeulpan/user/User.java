@@ -36,4 +36,9 @@ public class User {
     public User(String deviceToken) {
         this.deviceToken = deviceToken;
     }
+
+    /** 로그인·로그아웃 때 토큰을 바꿉니다. 이전 토큰은 조회되지 않으므로 자동으로 쓸 수 없게 됩니다. */
+    public void changeDeviceToken(String newToken) {
+        this.deviceToken = newToken;
+    }
 }

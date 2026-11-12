@@ -9,13 +9,16 @@
 - 인증 헤더: `X-Device-Token: {UUID}`
 - 공통 응답·에러 형식·에러 코드: [common.md](common.md)
 - BE-A 담당 상세: [pasture.md](pasture.md), [sheep.md](sheep.md), [demo.md](demo.md) (구현된 경로)
-- BE-B 담당 상세: [bubble.md](bubble.md), [scarf.md](scarf.md) (개발 명세 기준 경로)
+- BE-B 담당 상세: [auth.md](auth.md), [bubble.md](bubble.md), [scarf.md](scarf.md) (개발 명세 기준 경로)
 
 ## 엔드포인트 목록 (초안)
 
 | 기능 | 메서드 | 경로 | 담당 | 상태 |
 |---|---|---|---|---|
 | 기기 토큰 발급 | POST | `/api/users` | BE-A | 구현됨 |
+| 가입 (아이디·비밀번호, 선택) | POST | `/api/auth/signup` | BE-B | 구현됨 |
+| 로그인 (새 토큰 발급) | POST | `/api/auth/login` | BE-B | 구현됨 |
+| 로그아웃 (토큰 무효화) | POST | `/api/auth/logout` | BE-B | 구현됨 |
 | F1 들판 만들기 (내 양 포함) | POST | `/api/pastures` | BE-A | 구현됨 |
 | F1 들판 미리보기 (링크 구경, 토큰 불필요) | GET | `/api/pastures/{pastureId}/preview` | BE-A | 구현됨 |
 | F1 들판 합류 (양 만들기·동의) | POST | `/api/pastures/{pastureId}/sheep` | BE-A | 구현됨 |
@@ -35,6 +38,7 @@
 ```
 docs/api/
   common.md     # 인증·에러 형식·에러 코드
+  auth.md       # 가입·로그인·로그아웃
   pasture.md    # 기기 토큰, F1 들판, 들판 조회
   sheep.md      # F2 쓰다듬기
   bubble.md     # F4 말풍선
