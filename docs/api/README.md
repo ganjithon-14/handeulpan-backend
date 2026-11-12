@@ -7,21 +7,24 @@
 - Base URL: `TBD`
 - 인증 헤더: `X-Device-Token: {UUID}`
 - 공통 응답·에러 형식·에러 코드: [common.md](common.md)
+- BE-A 담당 상세: [pasture.md](pasture.md), [sheep.md](sheep.md), [demo.md](demo.md) (구현된 경로)
 - BE-B 담당 상세: [bubble.md](bubble.md), [scarf.md](scarf.md) (개발 명세 기준 경로)
 
 ## 엔드포인트 목록 (초안)
 
 | 기능 | 메서드 | 경로 | 담당 | 상태 |
 |---|---|---|---|---|
-| F1 들판 만들기 | POST | `/api/fields` | BE-A | 초안 |
-| F1 들판 미리보기 (링크 구경) | GET | `/api/fields/{fieldId}/preview` | BE-A | 초안 |
-| F1 들판 합류 (양 만들기·동의) | POST | `/api/fields/{fieldId}/sheep` | BE-A | 초안 |
-| 들판 조회 (화면 전체) | GET | `/api/fields/{fieldId}` | BE-A | 초안 |
-| F2 쓰다듬기 | POST | `/api/fields/{fieldId}/pat` | BE-A | 초안 |
+| 기기 토큰 발급 | POST | `/api/users` | BE-A | 구현됨 |
+| F1 들판 만들기 (내 양 포함) | POST | `/api/pastures` | BE-A | 구현됨 |
+| F1 들판 미리보기 (링크 구경, 토큰 불필요) | GET | `/api/pastures/{pastureId}/preview` | BE-A | 구현됨 |
+| F1 들판 합류 (양 만들기·동의) | POST | `/api/pastures/{pastureId}/sheep` | BE-A | 구현됨 |
+| 들판 조회 (화면 전체) | GET | `/api/pastures/{pastureId}` | BE-A | 구현됨 |
+| 내 들판 목록 (홈) | GET | `/api/pastures` | BE-A | 구현됨 |
+| F2 쓰다듬기 | POST | `/api/sheep/{sheepId}/pat` | BE-A | 구현됨 |
 | F4 말풍선 쓰기 (위험 키워드 검사) | POST | `/api/fields/{fieldId}/bubble` | BE-B | 초안 |
 | F7 목도리 보내기 | POST | `/api/fields/{fieldId}/sheep/{sheepId}/scarves` | BE-B | 초안 |
 | F7 받은 목도리 목록·두르기 | GET / PATCH | `/api/me/scarves` | BE-B | 초안 |
-| D 데모 되감기 | POST | `/api/demo/fields/{fieldId}/sheep/{sheepId}/rewind` | BE-A | 초안 |
+| D 데모 되감기 (`X-Demo-Key`) | POST | `/api/demo/sheep/{sheepId}/rewind` | BE-A | 구현됨 |
 
 경로는 예시입니다. 확정되면 아래처럼 파일을 하나씩 추가해 주세요.
 
