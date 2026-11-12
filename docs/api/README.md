@@ -27,11 +27,11 @@
 | F2 쓰다듬기 | POST | `/api/sheep/{sheepId}/pat` | BE-A | 구현됨 |
 | F4 말풍선 올리기 (위험 키워드 검사) | PUT | `/api/sheep/{sheepId}/bubble` | BE-B | 구현됨 |
 | F4 말풍선 지우기 | DELETE | `/api/sheep/{sheepId}/bubble` | BE-B | 구현됨 |
-| F7 목도리 보내기 | POST | `/api/fields/{fieldId}/sheep/{sheepId}/scarves` | BE-B | 초안 |
-| F7 받은 목도리 목록·두르기 | GET / PATCH | `/api/me/scarves` | BE-B | 초안 |
+| F7 목도리 보내기 | POST | `/api/sheep/{sheepId}/scarves` | BE-B | 구현됨 |
+| F7 목도리 두르기·벗기 (받은 목록은 들판 조회의 `myScarves`) | PUT | `/api/sheep/{sheepId}/scarf` | BE-B | 구현됨 |
 | D 데모 되감기 (`X-Demo-Key`) | POST | `/api/demo/sheep/{sheepId}/rewind` | BE-A | 구현됨 |
 
-말풍선·목도리의 경로는 구현하면서 확정합니다. (목도리 줄은 아직 초안)
+말풍선·목도리 경로는 구현된 경로입니다.
 
 ## 상세 문서
 
