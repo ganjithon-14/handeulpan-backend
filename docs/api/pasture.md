@@ -1,15 +1,9 @@
-# 기기 토큰 · 들판 API (F1, BE-A)
+# 들판 API (F1, BE-A)
 
 공통 규칙·에러 형식은 [common.md](common.md)를 따릅니다.
 
-## POST /api/users — 기기 토큰 발급
-
-토큰이 없을 때 한 번 호출하고, 받은 값을 브라우저에 저장합니다. 이후 모든 요청에 `X-Device-Token` 헤더로 보냅니다. (아이디·비밀번호로 가입하면 기기를 바꿔도 같은 사용자로 돌아올 수 있습니다. → [auth.md](auth.md))
-
-응답 `201`
-```json
-{ "deviceToken": "3f1c7a0e-6c1b-4a8e-9a63-0c1f5d2b7e11" }
-```
+토큰은 가입·로그인으로 받습니다. 받은 값을 브라우저에 저장하고 이후 모든 요청에 `X-Device-Token` 헤더로 보냅니다. → [auth.md](auth.md)
+양 이름은 가입한 **닉네임**입니다. 들판을 만들거나 합류할 때 이름을 따로 보내지 않습니다.
 
 ## POST /api/pastures — 들판 만들기
 
@@ -17,13 +11,12 @@
 
 요청
 ```json
-{ "name": "대학 동기", "sheepName": "두부", "woolColor": "CREAM", "agreed": true }
+{ "name": "대학 동기", "woolColor": "CREAM", "agreed": true }
 ```
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
 | `name` | string \| null | 들판 이름, 0~20자, 생략 가능 |
-| `sheepName` | string | 내 양 이름, 1~10자 |
 | `woolColor` | string | `CREAM` `PINK` `YELLOW` `MINT` `SKY` `LAVENDER` |
 | `agreed` | boolean | "멀어지면 들판 친구들이 알 수 있어요" 동의. `true`여야 함 |
 
@@ -54,7 +47,7 @@
 
 요청
 ```json
-{ "sheepName": "콩이", "woolColor": "MINT", "agreed": true }
+{ "woolColor": "MINT", "agreed": true }
 ```
 응답 `201`
 ```json

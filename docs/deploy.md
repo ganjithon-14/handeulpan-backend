@@ -28,10 +28,11 @@ docker compose up -d --build
 ```bash
 docker compose ps                 # 세 컨테이너가 Up인지
 docker compose logs -f app        # 앱 로그
-curl -X POST https://{DOMAIN}/api/users
+curl -X POST https://{DOMAIN}/api/auth/signup -H 'Content-Type: application/json' \
+  -d '{"nickname":"확인용","email":"check@example.com","password":"pass1234!"}'
 ```
 
-`{"deviceToken": "..."}`가 오면 성공입니다.
+`{"deviceToken": "..."}`가 오면 성공입니다. 확인용 계정이 DB에 남으니, 시연 전에 데이터를 정리할 때 함께 지웁니다.
 
 ## 업데이트 배포
 

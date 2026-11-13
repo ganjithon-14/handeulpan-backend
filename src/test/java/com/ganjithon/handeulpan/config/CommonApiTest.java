@@ -42,7 +42,7 @@ class CommonApiTest {
 
     @Test
     void 존재하지_않는_들판은_404_PASTURE_NOT_FOUND() throws Exception {
-        String token = issueToken();
+        String token = signup("두부");
         mvc.perform(get("/api/pastures/{id}", "no-such-pasture").header("X-Device-Token", token))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("PASTURE_NOT_FOUND"))
@@ -51,10 +51,10 @@ class CommonApiTest {
 
     @Test
     void 검증에_실패하면_400_VALIDATION_FAILED() throws Exception {
-        String token = issueToken();
+        String token = signup("두부");
         mvc.perform(post("/api/pastures").header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sheepName\":\"\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
+                        .content("{\"woolColor\":\"CREAM\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
@@ -62,7 +62,7 @@ class CommonApiTest {
 
     @Test
     void 깨진_JSON도_400_VALIDATION_FAILED() throws Exception {
-        String token = issueToken();
+        String token = signup("두부");
         mvc.perform(post("/api/pastures").header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{not json"))
@@ -79,7 +79,7 @@ class CommonApiTest {
 
     @Test
     void 지원하지_않는_메서드는_405() throws Exception {
-        mvc.perform(get("/api/users"))
+        mvc.perform(get("/api/auth/login"))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
     }
@@ -146,9 +146,7 @@ class CommonApiTest {
                 .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist());
     }
 
-    private String issueToken() throws Exception {
-        String body = mvc.perform(post("/api/users")).andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        return JsonPath.read(body, "$.deviceToken");
+    private String signup(String nickname) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
     }
 }

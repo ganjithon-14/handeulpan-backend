@@ -15,8 +15,7 @@
 
 | 기능 | 메서드 | 경로 | 담당 | 상태 |
 |---|---|---|---|---|
-| 기기 토큰 발급 | POST | `/api/users` | BE-A | 구현됨 |
-| 가입 (아이디·비밀번호, 선택) | POST | `/api/auth/signup` | BE-B | 구현됨 |
+| 가입 (닉네임·이메일·비밀번호, 토큰 발급) | POST | `/api/auth/signup` | BE-B | 구현됨 |
 | 로그인 (새 토큰 발급) | POST | `/api/auth/login` | BE-B | 구현됨 |
 | 로그아웃 (토큰 무효화) | POST | `/api/auth/logout` | BE-B | 구현됨 |
 | F1 들판 만들기 (내 양 포함) | POST | `/api/pastures` | BE-A | 구현됨 |
@@ -39,7 +38,7 @@
 docs/api/
   common.md     # 인증·에러 형식·에러 코드
   auth.md       # 가입·로그인·로그아웃
-  pasture.md    # 기기 토큰, F1 들판, 들판 조회
+  pasture.md    # F1 들판, 들판 조회
   sheep.md      # F2 쓰다듬기
   bubble.md     # F4 말풍선
   scarf.md      # F7 목도리

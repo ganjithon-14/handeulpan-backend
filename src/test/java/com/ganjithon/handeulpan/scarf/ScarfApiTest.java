@@ -49,15 +49,15 @@ class ScarfApiTest {
     @BeforeEach
     void setUp() throws Exception {
         clock.set(TestClockConfig.START);
-        owner = issueToken();
-        friend = issueToken();
+        owner = signup("두부");
+        friend = signup("콩이");
         MvcResult created = mvc.perform(post("/api/pastures").header("X-Device-Token", owner)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"동기\",\"sheepName\":\"두부\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
+                        .content("{\"name\":\"동기\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         pastureId = JsonPath.read(created.getResponse().getContentAsString(), "$.pastureId");
         ownerSheep = idOf(created, "$.sheepId");
-        friendSheep = join(friend, "콩이", "MINT");
+        friendSheep = join(friend, "MINT");
     }
 
     // ---------- 보내기 ----------
@@ -96,8 +96,8 @@ class ScarfApiTest {
 
     @Test
     void 다른_친구에게는_같은_날_또_보낼_수_있다() throws Exception {
-        String third = issueToken();
-        long thirdSheep = join(third, "별이", "PINK");
+        String third = signup("별이");
+        long thirdSheep = join(third, "PINK");
 
         send(owner, friendSheep).andExpect(status().isCreated());
         send(owner, thirdSheep).andExpect(status().isCreated());
@@ -105,7 +105,7 @@ class ScarfApiTest {
 
     @Test
     void 들판_멤버가_아니면_보낼_수_없다() throws Exception {
-        String stranger = issueToken();
+        String stranger = signup("낯선이");
         expectError(send(stranger, friendSheep), 403, "NOT_PASTURE_MEMBER");
     }
 
@@ -138,8 +138,8 @@ class ScarfApiTest {
 
     @Test
     void 새로_받으면_이전에_두른_목도리를_바꿔서_두른다() throws Exception {
-        String third = issueToken();
-        long thirdSheep = join(third, "별이", "PINK");
+        String third = signup("별이");
+        long thirdSheep = join(third, "PINK");
 
         send(owner, thirdSheep).andExpect(status().isCreated());   // CREAM
         send(friend, thirdSheep).andExpect(status().isCreated());  // MINT
@@ -151,9 +151,9 @@ class ScarfApiTest {
 
     @Test
     void 받은_목도리는_myScarves로_내려가고_최근_것이_먼저다() throws Exception {
-        String third = issueToken();
-        join(third, "별이", "PINK");
-        long thirdSheep = join(issueToken(), "하늘", "SKY");
+        String third = signup("별이");
+        join(third, "PINK");
+        long thirdSheep = join(signup("하늘"), "SKY");
 
         send(owner, thirdSheep).andExpect(status().isCreated());   // CREAM
         send(friend, thirdSheep).andExpect(status().isCreated());  // MINT
@@ -171,9 +171,9 @@ class ScarfApiTest {
 
     @Test
     void 같은_색은_하나만_내려가서_받은_개수가_드러나지_않는다() throws Exception {
-        long mintSender = join(issueToken(), "하나", "MINT"); // 친구(콩이)와 같은 MINT
-        String receiver = issueToken();
-        long receiverSheep = join(receiver, "별이", "PINK");
+        long mintSender = join(signup("하나"), "MINT"); // 친구(콩이)와 같은 MINT
+        String receiver = signup("별이");
+        long receiverSheep = join(receiver, "PINK");
 
         send(friend, receiverSheep).andExpect(status().isCreated());
         clock.advance(Duration.ofSeconds(1));
@@ -208,7 +208,7 @@ class ScarfApiTest {
 
     @Test
     void 받은_목도리_중에서_골라_두를_수_있다() throws Exception {
-        long thirdSheep = join(issueToken(), "하늘", "SKY");
+        long thirdSheep = join(signup("하늘"), "SKY");
         send(owner, thirdSheep).andExpect(status().isCreated());   // CREAM
         send(friend, thirdSheep).andExpect(status().isCreated());  // MINT (자동으로 두름)
         String token = tokenOfSheepOwner(thirdSheep);
@@ -296,10 +296,10 @@ class ScarfApiTest {
 
     private final java.util.Map<Long, String> tokensBySheep = new java.util.HashMap<>();
 
-    private long join(String token, String sheepName, String woolColor) throws Exception {
+    private long join(String token, String woolColor) throws Exception {
         MvcResult joined = mvc.perform(post("/api/pastures/{id}/sheep", pastureId).header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sheepName\":\"" + sheepName + "\",\"woolColor\":\"" + woolColor
+                        .content("{\"woolColor\":\"" + woolColor
                                 + "\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         long id = idOf(joined, "$.sheepId");
@@ -321,9 +321,8 @@ class ScarfApiTest {
         return ((Number) JsonPath.read(result.getResponse().getContentAsString(), path)).longValue();
     }
 
-    private String issueToken() throws Exception {
-        MvcResult result = mvc.perform(post("/api/users")).andExpect(status().isCreated()).andReturn();
-        return JsonPath.read(result.getResponse().getContentAsString(), "$.deviceToken");
+    private String signup(String nickname) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
     }
 
     private void expectError(ResultActions actions, int status, String code) throws Exception {

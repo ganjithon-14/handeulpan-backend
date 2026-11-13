@@ -49,9 +49,9 @@ class CoreLoopApiTest {
 
     @Test
     void 들판_만들고_링크로_합류해서_같이_보인다() throws Exception {
-        String dubu = issueToken();
-        String friend = issueToken();
-        String pastureId = createPasture(dubu, "두부");
+        String dubu = signup("두부");
+        String friend = signup("콩이");
+        String pastureId = createPasture(dubu);
 
         mvc.perform(get("/api/pastures/{id}/preview", pastureId))
                 .andExpect(status().isOk())
@@ -62,7 +62,7 @@ class CoreLoopApiTest {
                 .andExpect(jsonPath("$.sheep[0].distance").value("CENTER"))
                 .andExpect(jsonPath("$.sheep[0].id").doesNotExist());
 
-        join(friend, pastureId, "콩이").andExpect(status().isCreated())
+        join(friend, pastureId).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.pastureId").value(pastureId))
                 .andExpect(jsonPath("$.sheepId").isNumber());
 
@@ -80,10 +80,10 @@ class CoreLoopApiTest {
 
     @Test
     void 쓰다듬지_않으면_멀어지고_쓰다듬으면_가운데로_돌아온다() throws Exception {
-        String dubu = issueToken();
-        String friend = issueToken();
-        String pastureId = createPasture(dubu, "두부");
-        long friendSheep = sheepIdOf(join(friend, pastureId, "콩이"));
+        String dubu = signup("두부");
+        String friend = signup("콩이");
+        String pastureId = createPasture(dubu);
+        long friendSheep = sheepIdOf(join(friend, pastureId));
 
         clock.advance(Duration.ofDays(2));
         assertDistance(friend, pastureId, 0, "WALK");
@@ -112,10 +112,10 @@ class CoreLoopApiTest {
 
     @Test
     void 데모_되감기로_양을_바로_가장자리로_보낸다() throws Exception {
-        String dubu = issueToken();
-        String friend = issueToken();
-        String pastureId = createPasture(dubu, "두부");
-        long friendSheep = sheepIdOf(join(friend, pastureId, "콩이"));
+        String dubu = signup("두부");
+        String friend = signup("콩이");
+        String pastureId = createPasture(dubu);
+        long friendSheep = sheepIdOf(join(friend, pastureId));
 
         mvc.perform(post("/api/demo/sheep/{id}/rewind", friendSheep)
                         .header("X-Demo-Key", "test-demo-key")
@@ -133,23 +133,23 @@ class CoreLoopApiTest {
 
     @Test
     void 들판은_6마리까지_한_사람은_한_번만() throws Exception {
-        String owner = issueToken();
-        String pastureId = createPasture(owner, "양1");
+        String owner = signup("양1");
+        String pastureId = createPasture(owner);
         for (int i = 2; i <= 6; i++) {
-            join(issueToken(), pastureId, "양" + i).andExpect(status().isCreated());
+            join(signup("양" + i), pastureId).andExpect(status().isCreated());
         }
         mvc.perform(get("/api/pastures/{id}/preview", pastureId)).andExpect(jsonPath("$.full").value(true));
-        expectError(join(issueToken(), pastureId, "양7"), 409, "PASTURE_FULL");
-        expectError(join(owner, pastureId, "또양"), 409, "ALREADY_JOINED");
+        expectError(join(signup("양7"), pastureId), 409, "PASTURE_FULL");
+        expectError(join(owner, pastureId), 409, "ALREADY_JOINED");
     }
 
     @Test
     void 동의하지_않으면_합류할_수_없다() throws Exception {
-        String pastureId = createPasture(issueToken(), "두부");
+        String pastureId = createPasture(signup("두부"));
         mvc.perform(post("/api/pastures/{id}/sheep", pastureId)
-                        .header("X-Device-Token", issueToken())
+                        .header("X-Device-Token", signup("콩이"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sheepName\":\"콩이\",\"woolColor\":\"MINT\",\"agreed\":false}"))
+                        .content("{\"woolColor\":\"MINT\",\"agreed\":false}"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -161,25 +161,23 @@ class CoreLoopApiTest {
 
     @Test
     void 멤버가_아니면_들판을_조회할_수_없고_없는_들판은_404() throws Exception {
-        String pastureId = createPasture(issueToken(), "두부");
-        expectError(mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", issueToken())),
+        String pastureId = createPasture(signup("두부"));
+        expectError(mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", signup("콩이"))),
                 403, "NOT_PASTURE_MEMBER");
         expectError(mvc.perform(get("/api/pastures/{id}/preview", "no-such-pasture")), 404, "PASTURE_NOT_FOUND");
     }
 
     // ---------- helpers ----------
 
-    private String issueToken() throws Exception {
-        MvcResult result = mvc.perform(post("/api/users")).andExpect(status().isCreated()).andReturn();
-        return JsonPath.read(result.getResponse().getContentAsString(), "$.deviceToken");
+    private String signup(String nickname) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
     }
 
-    private String createPasture(String token, String sheepName) throws Exception {
+    private String createPasture(String token) throws Exception {
         MvcResult result = mvc.perform(post("/api/pastures")
                         .header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"대학 동기\",\"sheepName\":\"" + sheepName
-                                + "\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
+                        .content("{\"name\":\"대학 동기\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.sheepId").isNumber())
                 .andReturn();
@@ -188,11 +186,11 @@ class CoreLoopApiTest {
         return id;
     }
 
-    private ResultActions join(String token, String pastureId, String sheepName) throws Exception {
+    private ResultActions join(String token, String pastureId) throws Exception {
         return mvc.perform(post("/api/pastures/{id}/sheep", pastureId)
                 .header("X-Device-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"sheepName\":\"" + sheepName + "\",\"woolColor\":\"MINT\",\"agreed\":true}"));
+                .content("{\"woolColor\":\"MINT\",\"agreed\":true}"));
     }
 
     private long sheepIdOf(ResultActions joined) throws Exception {

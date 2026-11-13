@@ -48,17 +48,17 @@ class BubbleApiTest {
     @BeforeEach
     void setUp() throws Exception {
         clock.set(TestClockConfig.START);
-        owner = issueToken();
-        friend = issueToken();
+        owner = signup("두부");
+        friend = signup("콩이");
         MvcResult created = mvc.perform(post("/api/pastures").header("X-Device-Token", owner)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"동기\",\"sheepName\":\"두부\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
+                        .content("{\"name\":\"동기\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         pastureId = JsonPath.read(created.getResponse().getContentAsString(), "$.pastureId");
         ownerSheep = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "$.sheepId")).longValue();
         MvcResult joined = mvc.perform(post("/api/pastures/{id}/sheep", pastureId).header("X-Device-Token", friend)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sheepName\":\"콩이\",\"woolColor\":\"MINT\",\"agreed\":true}"))
+                        .content("{\"woolColor\":\"MINT\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         friendSheep = ((Number) JsonPath.read(joined.getResponse().getContentAsString(), "$.sheepId")).longValue();
     }
@@ -269,9 +269,8 @@ class BubbleApiTest {
                 .contentType(MediaType.APPLICATION_JSON).content(body));
     }
 
-    private String issueToken() throws Exception {
-        MvcResult result = mvc.perform(post("/api/users")).andExpect(status().isCreated()).andReturn();
-        return JsonPath.read(result.getResponse().getContentAsString(), "$.deviceToken");
+    private String signup(String nickname) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
     }
 
     private void expectError(ResultActions actions, int status, String code) throws Exception {

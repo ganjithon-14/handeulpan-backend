@@ -19,8 +19,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * 아이디·비밀번호 계정. {@link User}(기기 토큰 사용자)와 1:1로 붙어서,
- * 기기를 바꿔도 같은 사용자(양·들판)로 들어올 수 있게 합니다. users 테이블은 건드리지 않습니다.
+ * 닉네임·이메일·비밀번호 계정. 모든 {@link User}에 계정이 하나 있고, 기기를 바꿔도 로그인하면
+ * 같은 사용자(양·들판)로 들어올 수 있습니다. users 테이블은 건드리지 않습니다.
  */
 @Entity
 @Table(name = "accounts")
@@ -28,6 +28,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
+
+    public static final int NICKNAME_MAX_LENGTH = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,9 +39,13 @@ public class Account {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    /** 소문자로 정규화해서 저장합니다. (Dubu와 dubu가 다른 계정이 되지 않게) */
-    @Column(nullable = false, unique = true, length = 20)
-    private String username;
+    /** 양 이름으로도 쓰입니다. 2~10자, 중복 불가. */
+    @Column(nullable = false, unique = true, length = NICKNAME_MAX_LENGTH)
+    private String nickname;
+
+    /** 소문자로 정규화해서 저장합니다. (A@x.com과 a@x.com이 다른 계정이 되지 않게) */
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
 
     /** BCrypt 해시. 응답과 로그에 절대 내보내지 않습니다. */
     @Column(nullable = false, length = 60)
@@ -49,9 +55,10 @@ public class Account {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Account(User user, String username, String passwordHash) {
+    public Account(User user, String nickname, String email, String passwordHash) {
         this.user = user;
-        this.username = username;
+        this.nickname = nickname;
+        this.email = email;
         this.passwordHash = passwordHash;
     }
 }

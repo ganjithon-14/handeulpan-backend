@@ -1,5 +1,6 @@
 package com.ganjithon.handeulpan.pasture;
 
+import com.ganjithon.handeulpan.auth.AccountRepository;
 import com.ganjithon.handeulpan.pasture.dto.CreatePastureRequest;
 import com.ganjithon.handeulpan.pasture.dto.JoinPastureRequest;
 import com.ganjithon.handeulpan.pasture.dto.JoinedResponse;
@@ -29,6 +30,7 @@ public class PastureService {
 
     private final PastureRepository pastureRepository;
     private final SheepRepository sheepRepository;
+    private final AccountRepository accountRepository;
     private final PublicIdGenerator publicIdGenerator;
     private final DistancePolicy distancePolicy;
     private final List<PastureViewExtension> viewExtensions;
@@ -41,7 +43,7 @@ public class PastureService {
         String name = StringUtils.hasText(request.name()) ? request.name().trim() : null;
         Pasture pasture = pastureRepository.save(new Pasture(newPublicId(), name, me, now));
         Sheep sheep = sheepRepository.save(
-                new Sheep(pasture, me, request.sheepName().trim(), request.woolColor(), now));
+                new Sheep(pasture, me, nicknameOf(me), request.woolColor(), now));
         return new PastureCreatedResponse(pasture.getPublicId(), sheep.getId());
     }
 
@@ -69,7 +71,7 @@ public class PastureService {
             throw CoreError.PASTURE_FULL.exception();
         }
         Sheep sheep = sheepRepository.save(
-                new Sheep(pasture, me, request.sheepName().trim(), request.woolColor(), clock.instant()));
+                new Sheep(pasture, me, nicknameOf(me), request.woolColor(), clock.instant()));
         return new JoinedResponse(pasture.getPublicId(), sheep.getId());
     }
 
@@ -116,6 +118,12 @@ public class PastureService {
                             distancePolicy.distanceOf(mine), distancePolicy.pattedToday(mine), edgeFriends);
                 })
                 .toList();
+    }
+
+    /** 양 이름은 가입한 닉네임입니다. 모든 사용자는 가입하므로 계정이 항상 있습니다. */
+    private String nicknameOf(User me) {
+        return accountRepository.findByUserId(me.getId())
+                .orElseThrow(CoreError.INVALID_DEVICE_TOKEN::exception).getNickname();
     }
 
     private Pasture find(String publicId) {

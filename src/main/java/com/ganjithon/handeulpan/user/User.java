@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-/** 기기 토큰 하나 = 사용자 한 명. 회원가입·로그인 없음. */
+/** 사용자 한 명. 가입(닉네임·이메일·비밀번호)할 때 만들어지고, 요청은 이 사용자의 기기 토큰으로 구분합니다. */
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
