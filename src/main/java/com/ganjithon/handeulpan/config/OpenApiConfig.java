@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Swagger UI: /swagger-ui/index.html
- * 오른쪽 위 Authorize에 기기 토큰(POST /api/users로 받은 값)을 넣으면 이후 요청에 X-Device-Token 헤더가 붙습니다.
+ * 오른쪽 위 Authorize에 기기 토큰(가입 POST /api/auth/signup 또는 로그인으로 받은 값)을 넣으면 이후 요청에 X-Device-Token 헤더가 붙습니다.
  */
 @Configuration
 public class OpenApiConfig {
@@ -29,7 +29,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("한 들판 API")
-                        .description("멀리 있어도, 한 들판에. 인증은 헤더 X-Device-Token (POST /api/users로 발급).")
+                        .description("멀리 있어도, 한 들판에. 인증은 헤더 X-Device-Token (가입·로그인으로 발급).")
                         .version("MVP"))
                 .components(new Components().addSecuritySchemes(DEVICE_TOKEN, new SecurityScheme()
                         .type(SecurityScheme.Type.APIKEY)
