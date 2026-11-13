@@ -170,8 +170,7 @@ class CoreLoopApiTest {
     // ---------- helpers ----------
 
     private String issueToken() throws Exception {
-        MvcResult result = mvc.perform(post("/api/users")).andExpect(status().isCreated()).andReturn();
-        return JsonPath.read(result.getResponse().getContentAsString(), "$.deviceToken");
+        return com.ganjithon.handeulpan.support.TestUsers.signupNew(mvc);
     }
 
     private String createPasture(String token, String sheepName) throws Exception {

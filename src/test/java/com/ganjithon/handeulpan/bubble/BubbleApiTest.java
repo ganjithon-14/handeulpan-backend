@@ -270,8 +270,7 @@ class BubbleApiTest {
     }
 
     private String issueToken() throws Exception {
-        MvcResult result = mvc.perform(post("/api/users")).andExpect(status().isCreated()).andReturn();
-        return JsonPath.read(result.getResponse().getContentAsString(), "$.deviceToken");
+        return com.ganjithon.handeulpan.support.TestUsers.signupNew(mvc);
     }
 
     private void expectError(ResultActions actions, int status, String code) throws Exception {

@@ -16,9 +16,8 @@ public enum ApiError {
     BUBBLE_NOT_FOUND(HttpStatus.NOT_FOUND, "지울 말풍선이 없어요."),
 
     // 가입·로그인
-    DUPLICATE_USERNAME(HttpStatus.CONFLICT, "이미 사용 중인 아이디예요."),
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않아요."),
-    ALREADY_HAS_ACCOUNT(HttpStatus.CONFLICT, "이미 계정이 있어요. 로그인해 주세요."),
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 가입된 이메일이에요."),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않아요."),
 
     // 목도리
     SELF(HttpStatus.BAD_REQUEST, "내 양에게는 목도리를 보낼 수 없어요."),
