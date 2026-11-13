@@ -269,8 +269,8 @@ class BubbleApiTest {
                 .contentType(MediaType.APPLICATION_JSON).content(body));
     }
 
-    private String signup(String nickname) throws Exception {
-        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
+    private String signup(String sheepName) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, sheepName);
     }
 
     private void expectError(ResultActions actions, int status, String code) throws Exception {

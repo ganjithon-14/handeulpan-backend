@@ -143,10 +143,15 @@ class CommonApiTest {
                 .andExpect(jsonPath("$.components.securitySchemes.DeviceToken.in").value("header"))
                 // 들판 만들기는 문서에 있고 본문(request body)만 받는다. @CurrentUser User가 파라미터로 끼면 안 된다.
                 .andExpect(jsonPath("$.paths['/api/pastures'].post.requestBody").exists())
-                .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist());
+                .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist())
+                // 회원 전용: 가입은 문서에 있고(양 이름·이메일·비밀번호), 토큰만 발급하는 API와 합류 때 양 이름 입력은 없다.
+                .andExpect(jsonPath("$.paths['/api/auth/signup'].post").exists())
+                .andExpect(jsonPath("$.components.schemas.SignupRequest.properties.sheepName").exists())
+                .andExpect(jsonPath("$.paths['/api/users']").doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.JoinPastureRequest.properties.sheepName").doesNotExist());
     }
 
-    private String signup(String nickname) throws Exception {
-        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
+    private String signup(String sheepName) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, sheepName);
     }
 }

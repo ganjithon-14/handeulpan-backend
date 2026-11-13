@@ -17,7 +17,7 @@ public enum ApiError {
 
     // 가입·로그인
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 가입된 이메일이에요."),
-    DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 사용 중인 닉네임이에요."),
+    DUPLICATE_SHEEP_NAME(HttpStatus.CONFLICT, "이미 사용 중인 양 이름이에요."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않아요."),
 
     // 목도리

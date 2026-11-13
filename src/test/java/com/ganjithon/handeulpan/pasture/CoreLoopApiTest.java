@@ -169,8 +169,8 @@ class CoreLoopApiTest {
 
     // ---------- helpers ----------
 
-    private String signup(String nickname) throws Exception {
-        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
+    private String signup(String sheepName) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, sheepName);
     }
 
     private String createPasture(String token) throws Exception {

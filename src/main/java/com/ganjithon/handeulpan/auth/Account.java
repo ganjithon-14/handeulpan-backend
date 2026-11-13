@@ -19,7 +19,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * 닉네임·이메일·비밀번호 계정. 모든 {@link User}에 계정이 하나 있고, 기기를 바꿔도 로그인하면
+ * 양 이름·이메일·비밀번호 계정. 모든 {@link User}에 계정이 하나 있고, 기기를 바꿔도 로그인하면
  * 같은 사용자(양·들판)로 들어올 수 있습니다. users 테이블은 건드리지 않습니다.
  */
 @Entity
@@ -29,7 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
 
-    public static final int NICKNAME_MAX_LENGTH = 10;
+    public static final int SHEEP_NAME_MAX_LENGTH = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +39,9 @@ public class Account {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    /** 양 이름으로도 쓰입니다. 2~10자, 중복 불가. */
-    @Column(nullable = false, unique = true, length = NICKNAME_MAX_LENGTH)
-    private String nickname;
+    /** 양 이름입니다. 2~10자, 중복 불가. */
+    @Column(nullable = false, unique = true, length = SHEEP_NAME_MAX_LENGTH)
+    private String sheepName;
 
     /** 소문자로 정규화해서 저장합니다. (A@x.com과 a@x.com이 다른 계정이 되지 않게) */
     @Column(nullable = false, unique = true, length = 100)
@@ -55,9 +55,9 @@ public class Account {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Account(User user, String nickname, String email, String passwordHash) {
+    public Account(User user, String sheepName, String email, String passwordHash) {
         this.user = user;
-        this.nickname = nickname;
+        this.sheepName = sheepName;
         this.email = email;
         this.passwordHash = passwordHash;
     }
