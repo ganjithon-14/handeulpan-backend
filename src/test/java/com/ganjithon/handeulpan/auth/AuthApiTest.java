@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 양 이름·이메일·비밀번호 가입 / 로그인 / 로그아웃 (회원 전용, 기기 토큰 UUID 방식 유지) */
+/** 닉네임·이메일·비밀번호 가입 / 로그인 / 로그아웃 (회원 전용, 기기 토큰 UUID 방식 유지) */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -52,7 +52,7 @@ class AuthApiTest {
     }
 
     @Test
-    void 가입한_양_이름이_양에_쓰인다() throws Exception {
+    void 닉네임이_양_이름이_된다() throws Exception {
         String token = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
 
         String pastureId = createPasture(token);
@@ -71,14 +71,14 @@ class AuthApiTest {
     }
 
     @Test
-    void 양_이름이_중복이면_409() throws Exception {
+    void 닉네임이_중복이면_409() throws Exception {
         signup("두부", "dubu@test.com", PASSWORD).andExpect(status().isCreated());
 
-        expectError(signup("두부", "other@test.com", PASSWORD), 409, "DUPLICATE_SHEEP_NAME");
+        expectError(signup("두부", "other@test.com", PASSWORD), 409, "DUPLICATE_NICKNAME");
     }
 
     @Test
-    void 양_이름은_앞뒤_공백_없이_2에서_10자() throws Exception {
+    void 닉네임은_앞뒤_공백_없이_2에서_10자() throws Exception {
         signup("두부", "a@test.com", PASSWORD).andExpect(status().isCreated());              // 2자
         signup("열글자열글자열글자열", "b@test.com", PASSWORD).andExpect(status().isCreated());  // 10자
         signup("양 이름", "c@test.com", PASSWORD).andExpect(status().isCreated());            // 가운데 공백은 허용
@@ -188,9 +188,9 @@ class AuthApiTest {
 
     // ---------- helpers ----------
 
-    private ResultActions signup(String sheepName, String email, String password) throws Exception {
+    private ResultActions signup(String nickname, String email, String password) throws Exception {
         return mvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"sheepName\":\"" + sheepName + "\",\"email\":\"" + email
+                .content("{\"nickname\":\"" + nickname + "\",\"email\":\"" + email
                         + "\",\"password\":\"" + password + "\"}"));
     }
 

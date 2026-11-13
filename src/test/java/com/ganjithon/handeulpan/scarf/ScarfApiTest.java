@@ -321,8 +321,8 @@ class ScarfApiTest {
         return ((Number) JsonPath.read(result.getResponse().getContentAsString(), path)).longValue();
     }
 
-    private String signup(String sheepName) throws Exception {
-        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, sheepName);
+    private String signup(String nickname) throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
     }
 
     private void expectError(ResultActions actions, int status, String code) throws Exception {

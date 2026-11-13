@@ -15,7 +15,7 @@
 
 | 기능 | 메서드 | 경로 | 담당 | 상태 |
 |---|---|---|---|---|
-| 가입 (양 이름·이메일·비밀번호, 토큰 발급) | POST | `/api/auth/signup` | BE-B | 구현됨 |
+| 가입 (닉네임·이메일·비밀번호, 토큰 발급) | POST | `/api/auth/signup` | BE-B | 구현됨 |
 | 로그인 (새 토큰 발급) | POST | `/api/auth/login` | BE-B | 구현됨 |
 | 로그아웃 (토큰 무효화) | POST | `/api/auth/logout` | BE-B | 구현됨 |
 | F1 들판 만들기 (내 양 포함) | POST | `/api/pastures` | BE-A | 구현됨 |
