@@ -18,15 +18,10 @@ public final class TestUsers {
     private TestUsers() {
     }
 
-    /** 겹치지 않는 닉네임으로 가입하고 토큰을 돌려줍니다. 닉네임이 필요 없는 테스트용입니다. */
+    /** 겹치지 않는 이메일로 가입하고 기기 토큰을 돌려줍니다. */
     public static String signupNew(MockMvc mvc) throws Exception {
-        return signup(mvc, "유저" + SEQ.incrementAndGet());
-    }
-
-    /** 닉네임으로 가입하고 기기 토큰을 돌려줍니다. 이메일은 닉네임에서 만들어서 닉네임이 다르면 겹치지 않습니다. */
-    public static String signup(MockMvc mvc, String nickname) throws Exception {
         String body = mvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nickname\":\"" + nickname + "\",\"email\":\"" + nickname
+                        .content("{\"email\":\"user" + SEQ.incrementAndGet()
                                 + "@test.com\",\"password\":\"" + PASSWORD + "\"}"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();

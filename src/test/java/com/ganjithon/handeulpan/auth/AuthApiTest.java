@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 닉네임·이메일·비밀번호 가입 / 로그인 / 로그아웃 (회원 전용, 기기 토큰 UUID 방식 유지). 양 이름은 들판에서 따로 받는다. */
+/** 이메일·비밀번호 가입 / 로그인 / 로그아웃 (회원 전용, 기기 토큰 UUID 방식 유지). 양 이름은 가입이 아니라 들판에서 받는다. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -34,7 +34,7 @@ class AuthApiTest {
 
     @Test
     void 가입하면_바로_쓸_수_있는_토큰을_받는다() throws Exception {
-        String token = tokenOf(signup("두부", "dubu@test.com", PASSWORD).andExpect(status().isCreated()));
+        String token = tokenOf(signup("dubu@test.com", PASSWORD).andExpect(status().isCreated()));
 
         mvc.perform(get("/api/pastures").header("X-Device-Token", token)).andExpect(status().isOk());
     }
@@ -52,21 +52,9 @@ class AuthApiTest {
     }
 
     @Test
-    void 닉네임과_양_이름은_별개다() throws Exception {
-        String token = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
-
-        String pastureId = createPasture(token);
-
-        // 양 이름은 들판을 만들 때 따로 정한다. 닉네임("두부")은 양 이름이 되지 않는다.
-        mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sheep[0].name").value("별이"));
-    }
-
-    @Test
     void 양_이름은_다른_사람과_같아도_된다() throws Exception {
-        String first = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
-        String second = tokenOf(signup("콩이", "kong@test.com", PASSWORD));
+        String first = tokenOf(signup("dubu@test.com", PASSWORD));
+        String second = tokenOf(signup("kong@test.com", PASSWORD));
 
         createPasture(first);
         createPasture(second);
@@ -74,52 +62,32 @@ class AuthApiTest {
 
     @Test
     void 이메일은_대소문자_구분_없이_중복이면_409() throws Exception {
-        signup("두부", "Dubu@Test.com", PASSWORD).andExpect(status().isCreated());
+        signup("Dubu@Test.com", PASSWORD).andExpect(status().isCreated());
 
-        expectError(signup("콩이", "dubu@test.com", PASSWORD), 409, "DUPLICATE_EMAIL");
-        expectError(signup("콩이", "DUBU@TEST.COM", PASSWORD), 409, "DUPLICATE_EMAIL");
-    }
-
-    @Test
-    void 닉네임이_중복이면_409() throws Exception {
-        signup("두부", "dubu@test.com", PASSWORD).andExpect(status().isCreated());
-
-        expectError(signup("두부", "other@test.com", PASSWORD), 409, "DUPLICATE_NICKNAME");
-    }
-
-    @Test
-    void 닉네임은_앞뒤_공백_없이_2에서_10자() throws Exception {
-        signup("두부", "a@test.com", PASSWORD).andExpect(status().isCreated());              // 2자
-        signup("열글자열글자열글자열", "b@test.com", PASSWORD).andExpect(status().isCreated());  // 10자
-        signup("양 이름", "c@test.com", PASSWORD).andExpect(status().isCreated());            // 가운데 공백은 허용
-        signup("🐑🐑", "d@test.com", PASSWORD).andExpect(status().isCreated());              // 이모지는 한 글자로 센다
-
-        expectError(signup("두", "e@test.com", PASSWORD), 400, "VALIDATION_FAILED");                  // 1자
-        expectError(signup("열한글자열한글자열한글", "e@test.com", PASSWORD), 400, "VALIDATION_FAILED"); // 11자
-        expectError(signup(" 두부", "e@test.com", PASSWORD), 400, "VALIDATION_FAILED");               // 앞 공백
-        expectError(signup("두부 ", "e@test.com", PASSWORD), 400, "VALIDATION_FAILED");               // 뒤 공백
+        expectError(signup("dubu@test.com", PASSWORD), 409, "DUPLICATE_EMAIL");
+        expectError(signup("DUBU@TEST.COM", PASSWORD), 409, "DUPLICATE_EMAIL");
     }
 
     @Test
     void 이메일_형식이_틀리면_400() throws Exception {
-        expectError(signup("두부", "dubu", PASSWORD), 400, "VALIDATION_FAILED");
-        expectError(signup("두부", "dubu@test", PASSWORD), 400, "VALIDATION_FAILED");
-        expectError(signup("두부", "du bu@test.com", PASSWORD), 400, "VALIDATION_FAILED");
-        expectError(signup("두부", "a".repeat(100) + "@test.com", PASSWORD), 400, "VALIDATION_FAILED");
+        expectError(signup("dubu", PASSWORD), 400, "VALIDATION_FAILED");
+        expectError(signup("dubu@test", PASSWORD), 400, "VALIDATION_FAILED");
+        expectError(signup("du bu@test.com", PASSWORD), 400, "VALIDATION_FAILED");
+        expectError(signup("a".repeat(100) + "@test.com", PASSWORD), 400, "VALIDATION_FAILED");
     }
 
     @Test
     void 비밀번호_형식이_틀리면_400() throws Exception {
-        expectError(signup("두부", "dubu@test.com", "short1!"), 400, "VALIDATION_FAILED");          // 8자 미만
-        expectError(signup("두부", "dubu@test.com", "pass word1"), 400, "VALIDATION_FAILED");       // 공백
-        expectError(signup("두부", "dubu@test.com", "비밀번호비밀번호비밀"), 400, "VALIDATION_FAILED"); // 한글
+        expectError(signup("dubu@test.com", "short1!"), 400, "VALIDATION_FAILED");          // 8자 미만
+        expectError(signup("dubu@test.com", "pass word1"), 400, "VALIDATION_FAILED");       // 공백
+        expectError(signup("dubu@test.com", "비밀번호비밀번호비밀"), 400, "VALIDATION_FAILED"); // 한글
         expectError(mvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 400, "VALIDATION_FAILED");
     }
 
     @Test
     void 비밀번호는_해시로_저장되고_응답에_나오지_않는다(@Autowired AccountRepository accounts) throws Exception {
-        String body = signup("두부", "dubu@test.com", PASSWORD).andExpect(status().isCreated())
+        String body = signup("dubu@test.com", PASSWORD).andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
         assertThat(body).doesNotContain(PASSWORD);
@@ -131,7 +99,7 @@ class AuthApiTest {
 
     @Test
     void 로그인하면_새_토큰을_받고_같은_양이_보인다() throws Exception {
-        String oldToken = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
+        String oldToken = tokenOf(signup("dubu@test.com", PASSWORD));
         String pastureId = createPasture(oldToken);
 
         String newToken = tokenOf(login("dubu@test.com", PASSWORD).andExpect(status().isOk()));
@@ -147,14 +115,14 @@ class AuthApiTest {
 
     @Test
     void 로그인_이메일은_대소문자를_가리지_않는다() throws Exception {
-        signup("두부", "Dubu@Test.com", PASSWORD).andExpect(status().isCreated());
+        signup("Dubu@Test.com", PASSWORD).andExpect(status().isCreated());
 
         login("DUBU@test.COM", PASSWORD).andExpect(status().isOk());
     }
 
     @Test
     void 틀린_비밀번호와_없는_이메일은_같은_401로_답한다() throws Exception {
-        signup("두부", "dubu@test.com", PASSWORD).andExpect(status().isCreated());
+        signup("dubu@test.com", PASSWORD).andExpect(status().isCreated());
 
         expectError(login("dubu@test.com", "wrong-password1"), 401, "INVALID_CREDENTIALS");
         expectError(login("nobody@test.com", PASSWORD), 401, "INVALID_CREDENTIALS");
@@ -170,7 +138,7 @@ class AuthApiTest {
 
     @Test
     void 로그아웃하면_204이고_그_토큰은_쓸_수_없다() throws Exception {
-        String token = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
+        String token = tokenOf(signup("dubu@test.com", PASSWORD));
 
         mvc.perform(post("/api/auth/logout").header("X-Device-Token", token)).andExpect(status().isNoContent());
 
@@ -180,7 +148,7 @@ class AuthApiTest {
 
     @Test
     void 로그아웃_뒤_다시_로그인하면_데이터가_그대로_있다() throws Exception {
-        String token = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
+        String token = tokenOf(signup("dubu@test.com", PASSWORD));
         String pastureId = createPasture(token);
 
         mvc.perform(post("/api/auth/logout").header("X-Device-Token", token)).andExpect(status().isNoContent());
@@ -198,9 +166,9 @@ class AuthApiTest {
 
     // ---------- helpers ----------
 
-    private ResultActions signup(String nickname, String email, String password) throws Exception {
+    private ResultActions signup(String email, String password) throws Exception {
         return mvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"nickname\":\"" + nickname + "\",\"email\":\"" + email
+                .content("{\"email\":\"" + email
                         + "\",\"password\":\"" + password + "\"}"));
     }
 

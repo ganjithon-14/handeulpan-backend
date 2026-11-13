@@ -25,22 +25,17 @@ public class AuthService {
     @Transactional
     public String signup(SignupRequest request) {
         String email = normalize(request.email());
-        String nickname = request.nickname();
         if (accountRepository.existsByEmail(email)) {
             throw ApiError.DUPLICATE_EMAIL.exception();
-        }
-        if (accountRepository.existsByNickname(nickname)) {
-            throw ApiError.DUPLICATE_NICKNAME.exception();
         }
 
         User user = userRepository.save(new User(newToken()));
         try {
             accountRepository.saveAndFlush(
-                    new Account(user, nickname, email, passwordEncoder.encode(request.password())));
+                    new Account(user, email, passwordEncoder.encode(request.password())));
         } catch (DataIntegrityViolationException e) {
-            // 위 확인과 저장 사이에 같은 이메일·닉네임이 먼저 들어온 경우
-            throw (accountRepository.existsByEmail(email) ? ApiError.DUPLICATE_EMAIL : ApiError.DUPLICATE_NICKNAME)
-                    .exception();
+            // 위 확인과 저장 사이에 같은 이메일이 먼저 들어온 경우
+            throw ApiError.DUPLICATE_EMAIL.exception();
         }
         return user.getDeviceToken();
     }

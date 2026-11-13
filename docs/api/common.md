@@ -47,7 +47,6 @@
 | 404 | `SCARF_NOT_FOUND` | 내가 받은 목도리가 아님 | BE-B |
 | 403 | `INVALID_DEMO_KEY` | 데모 API의 `X-Demo-Key`가 틀림 | BE-A |
 | 409 | `DUPLICATE_EMAIL` | 이미 가입된 이메일로 가입 | BE-B |
-| 409 | `DUPLICATE_NICKNAME` | 이미 쓰는 닉네임으로 가입 | BE-B |
 | 401 | `INVALID_CREDENTIALS` | 로그인 이메일이 없거나 비밀번호가 틀림 | BE-B |
 
 `PASTURE_FULL`, `ALREADY_JOINED`, `ALREADY_SENT_TODAY`, `SELF`는 명세에 있는 값이고, 나머지는 BE-B가 제안한 이름입니다.
