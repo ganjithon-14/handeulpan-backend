@@ -42,7 +42,7 @@ class CommonApiTest {
 
     @Test
     void 존재하지_않는_들판은_404_PASTURE_NOT_FOUND() throws Exception {
-        String token = signup("두부");
+        String token = issueToken();
         mvc.perform(get("/api/pastures/{id}", "no-such-pasture").header("X-Device-Token", token))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("PASTURE_NOT_FOUND"))
@@ -51,10 +51,10 @@ class CommonApiTest {
 
     @Test
     void 검증에_실패하면_400_VALIDATION_FAILED() throws Exception {
-        String token = signup("두부");
+        String token = issueToken();
         mvc.perform(post("/api/pastures").header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"woolColor\":\"CREAM\"}"))
+                        .content("{\"sheepName\":\"\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
@@ -62,7 +62,7 @@ class CommonApiTest {
 
     @Test
     void 깨진_JSON도_400_VALIDATION_FAILED() throws Exception {
-        String token = signup("두부");
+        String token = issueToken();
         mvc.perform(post("/api/pastures").header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{not json"))
@@ -143,10 +143,17 @@ class CommonApiTest {
                 .andExpect(jsonPath("$.components.securitySchemes.DeviceToken.in").value("header"))
                 // 들판 만들기는 문서에 있고 본문(request body)만 받는다. @CurrentUser User가 파라미터로 끼면 안 된다.
                 .andExpect(jsonPath("$.paths['/api/pastures'].post.requestBody").exists())
-                .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist());
+                .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist())
+                // 회원 전용: 가입은 문서에 있고(닉네임·이메일·비밀번호), 토큰만 발급하는 API는 없다.
+                // 양 이름은 가입이 아니라 들판 만들기·합류에서 받는다.
+                .andExpect(jsonPath("$.paths['/api/auth/signup'].post").exists())
+                .andExpect(jsonPath("$.components.schemas.SignupRequest.properties.nickname").exists())
+                .andExpect(jsonPath("$.components.schemas.SignupRequest.properties.sheepName").doesNotExist())
+                .andExpect(jsonPath("$.paths['/api/users']").doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.JoinPastureRequest.properties.sheepName").exists());
     }
 
-    private String signup(String nickname) throws Exception {
-        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
+    private String issueToken() throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signupNew(mvc);
     }
 }

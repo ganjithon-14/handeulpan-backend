@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 닉네임·이메일·비밀번호 가입 / 로그인 / 로그아웃 (회원 전용, 기기 토큰 UUID 방식 유지) */
+/** 닉네임·이메일·비밀번호 가입 / 로그인 / 로그아웃 (회원 전용, 기기 토큰 UUID 방식 유지). 양 이름은 들판에서 따로 받는다. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -52,14 +52,24 @@ class AuthApiTest {
     }
 
     @Test
-    void 닉네임이_양_이름이_된다() throws Exception {
+    void 닉네임과_양_이름은_별개다() throws Exception {
         String token = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
 
         String pastureId = createPasture(token);
 
+        // 양 이름은 들판을 만들 때 따로 정한다. 닉네임("두부")은 양 이름이 되지 않는다.
         mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sheep[0].name").value("두부"));
+                .andExpect(jsonPath("$.sheep[0].name").value("별이"));
+    }
+
+    @Test
+    void 양_이름은_다른_사람과_같아도_된다() throws Exception {
+        String first = tokenOf(signup("두부", "dubu@test.com", PASSWORD));
+        String second = tokenOf(signup("콩이", "kong@test.com", PASSWORD));
+
+        createPasture(first);
+        createPasture(second);
     }
 
     @Test
@@ -129,7 +139,7 @@ class AuthApiTest {
         assertThat(newToken).isNotEqualTo(oldToken);
         mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", newToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sheep[0].name").value("두부"));
+                .andExpect(jsonPath("$.sheep[0].name").value("별이"));
         // 이전 토큰은 더 이상 통하지 않는다 (다른 기기에서 로그인한 것과 같다)
         expectError(mvc.perform(get("/api/pastures").header("X-Device-Token", oldToken)),
                 401, "INVALID_DEVICE_TOKEN");
@@ -178,7 +188,7 @@ class AuthApiTest {
 
         mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", again))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sheep[0].name").value("두부"));
+                .andExpect(jsonPath("$.sheep[0].name").value("별이"));
     }
 
     @Test
@@ -206,7 +216,7 @@ class AuthApiTest {
     private String createPasture(String token) throws Exception {
         MvcResult result = mvc.perform(post("/api/pastures").header("X-Device-Token", token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"동기\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
+                        .content("{\"name\":\"동기\",\"sheepName\":\"별이\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         return JsonPath.read(result.getResponse().getContentAsString(), "$.pastureId");
     }

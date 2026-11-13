@@ -48,17 +48,17 @@ class BubbleApiTest {
     @BeforeEach
     void setUp() throws Exception {
         clock.set(TestClockConfig.START);
-        owner = signup("두부");
-        friend = signup("콩이");
+        owner = issueToken();
+        friend = issueToken();
         MvcResult created = mvc.perform(post("/api/pastures").header("X-Device-Token", owner)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"동기\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
+                        .content("{\"name\":\"동기\",\"sheepName\":\"두부\",\"woolColor\":\"CREAM\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         pastureId = JsonPath.read(created.getResponse().getContentAsString(), "$.pastureId");
         ownerSheep = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "$.sheepId")).longValue();
         MvcResult joined = mvc.perform(post("/api/pastures/{id}/sheep", pastureId).header("X-Device-Token", friend)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"woolColor\":\"MINT\",\"agreed\":true}"))
+                        .content("{\"sheepName\":\"콩이\",\"woolColor\":\"MINT\",\"agreed\":true}"))
                 .andExpect(status().isCreated()).andReturn();
         friendSheep = ((Number) JsonPath.read(joined.getResponse().getContentAsString(), "$.sheepId")).longValue();
     }
@@ -269,8 +269,8 @@ class BubbleApiTest {
                 .contentType(MediaType.APPLICATION_JSON).content(body));
     }
 
-    private String signup(String nickname) throws Exception {
-        return com.ganjithon.handeulpan.support.TestUsers.signup(mvc, nickname);
+    private String issueToken() throws Exception {
+        return com.ganjithon.handeulpan.support.TestUsers.signupNew(mvc);
     }
 
     private void expectError(ResultActions actions, int status, String code) throws Exception {
