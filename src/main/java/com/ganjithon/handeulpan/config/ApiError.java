@@ -18,7 +18,12 @@ public enum ApiError {
     // 가입·로그인
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "이미 사용 중인 아이디예요."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않아요."),
-    ALREADY_HAS_ACCOUNT(HttpStatus.CONFLICT, "이미 계정이 있어요. 로그인해 주세요.");
+    ALREADY_HAS_ACCOUNT(HttpStatus.CONFLICT, "이미 계정이 있어요. 로그인해 주세요."),
+
+    // 목도리
+    SELF(HttpStatus.BAD_REQUEST, "내 양에게는 목도리를 보낼 수 없어요."),
+    ALREADY_SENT_TODAY(HttpStatus.CONFLICT, "오늘은 이미 목도리를 보냈어요."),
+    SCARF_NOT_FOUND(HttpStatus.NOT_FOUND, "받은 목도리가 아니에요.");
 
     private final HttpStatus status;
     private final String message;
