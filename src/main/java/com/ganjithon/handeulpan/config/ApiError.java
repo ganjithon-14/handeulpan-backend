@@ -13,7 +13,12 @@ public enum ApiError {
 
     // 말풍선
     BUBBLE_TEXT_INVALID(HttpStatus.BAD_REQUEST, "말풍선은 1~20자로 적어 주세요."),
-    BUBBLE_NOT_FOUND(HttpStatus.NOT_FOUND, "지울 말풍선이 없어요.");
+    BUBBLE_NOT_FOUND(HttpStatus.NOT_FOUND, "지울 말풍선이 없어요."),
+
+    // 가입·로그인
+    DUPLICATE_USERNAME(HttpStatus.CONFLICT, "이미 사용 중인 아이디예요."),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않아요."),
+    ALREADY_HAS_ACCOUNT(HttpStatus.CONFLICT, "이미 계정이 있어요. 로그인해 주세요.");
 
     private final HttpStatus status;
     private final String message;
