@@ -18,7 +18,15 @@ public class DistancePolicy {
     private final Clock clock;
 
     public Distance distanceOf(Sheep sheep) {
-        return distanceOf(sheep.getLastPattedAt(), clock.instant());
+        Instant now = clock.instant();
+        if (sheep.isNapping(now)) {
+            return Distance.CENTER; // 낮잠 중에는 멀어지지 않습니다
+        }
+        return distanceOf(sheep.distanceClockStart(), now);
+    }
+
+    public boolean isNapping(Sheep sheep) {
+        return sheep.isNapping(clock.instant());
     }
 
     Distance distanceOf(Instant lastPattedAt, Instant now) {
