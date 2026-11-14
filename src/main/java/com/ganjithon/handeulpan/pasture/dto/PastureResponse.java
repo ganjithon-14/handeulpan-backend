@@ -40,7 +40,7 @@ public class PastureResponse {
 
     @Getter
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonPropertyOrder({"id", "name", "woolColor", "distance", "mine", "pattedToday"})
+    @JsonPropertyOrder({"id", "name", "woolColor", "distance", "mine", "pattedToday", "napping"})
     public static class SheepView {
 
         private final Long id;
@@ -50,15 +50,19 @@ public class PastureResponse {
         private final boolean mine;
         /** 내 양에만 내려갑니다. 친구 양은 null(필드 생략) — 접속·체크인 여부를 노출하지 않기 위해. */
         private final Boolean pattedToday;
+        /** 낮잠 중인 양. 친구에게도 보입니다. 끝나는 시각은 내보내지 않습니다. */
+        private final boolean napping;
         private final Map<String, Object> extra = new LinkedHashMap<>();
 
-        public SheepView(Long id, String name, WoolColor woolColor, Distance distance, boolean mine, Boolean pattedToday) {
+        public SheepView(Long id, String name, WoolColor woolColor, Distance distance, boolean mine, Boolean pattedToday,
+                         boolean napping) {
             this.id = id;
             this.name = name;
             this.woolColor = woolColor;
             this.distance = distance;
             this.mine = mine;
             this.pattedToday = pattedToday;
+            this.napping = napping;
         }
 
         @JsonAnyGetter

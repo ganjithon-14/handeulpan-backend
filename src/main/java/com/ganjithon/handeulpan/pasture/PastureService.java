@@ -51,7 +51,8 @@ public class PastureService {
         Pasture pasture = find(publicId);
         List<Sheep> sheep = sheepRepository.findAllInPasture(pasture.getId());
         List<PreviewSheep> views = sheep.stream()
-                .map(s -> new PreviewSheep(s.getName(), s.getWoolColor(), distancePolicy.distanceOf(s)))
+                .map(s -> new PreviewSheep(s.getName(), s.getWoolColor(), distancePolicy.distanceOf(s),
+                        distancePolicy.isNapping(s)))
                 .toList();
         return new PasturePreviewResponse(pasture.getPublicId(), pasture.getName(), Pasture.MAX_SHEEP,
                 sheep.size() >= Pasture.MAX_SHEEP, views);
@@ -62,14 +63,24 @@ public class PastureService {
     public JoinedResponse join(User me, String publicId, JoinPastureRequest request) {
         Pasture pasture = pastureRepository.findByPublicIdForUpdate(publicId)
                 .orElseThrow(CoreError.PASTURE_NOT_FOUND::exception);
-        if (sheepRepository.existsByPastureIdAndUserId(pasture.getId(), me.getId())) {
+        Instant now = clock.instant();
+        String sheepName = request.sheepName().trim();
+
+        // 나갔던 들판에 다시 들어오는 경우: 같은 양 행을 되살립니다.
+        Sheep existing = sheepRepository.findByPastureIdAndUserId(pasture.getId(), me.getId()).orElse(null);
+        if (existing != null && existing.isActive()) {
             throw CoreError.ALREADY_JOINED.exception();
         }
-        if (sheepRepository.countByPastureId(pasture.getId()) >= Pasture.MAX_SHEEP) {
+        if (sheepRepository.countByPastureIdAndLeftAtIsNull(pasture.getId()) >= Pasture.MAX_SHEEP) {
             throw CoreError.PASTURE_FULL.exception();
         }
-        Sheep sheep = sheepRepository.save(
-                new Sheep(pasture, me, request.sheepName().trim(), request.woolColor(), clock.instant()));
+        Sheep sheep;
+        if (existing != null) {
+            existing.rejoin(sheepName, request.woolColor(), now);
+            sheep = existing;
+        } else {
+            sheep = sheepRepository.save(new Sheep(pasture, me, sheepName, request.woolColor(), now));
+        }
         return new JoinedResponse(pasture.getPublicId(), sheep.getId());
     }
 
@@ -85,7 +96,7 @@ public class PastureService {
                 .map(s -> {
                     boolean isMine = s == mine;
                     return new SheepView(s.getId(), s.getName(), s.getWoolColor(), distancePolicy.distanceOf(s),
-                            isMine, isMine ? distancePolicy.pattedToday(s) : null);
+                            isMine, isMine ? distancePolicy.pattedToday(s) : null, distancePolicy.isNapping(s));
                 })
                 .toList();
         PastureResponse response = new PastureResponse(
@@ -113,7 +124,8 @@ public class PastureService {
                             .map(Sheep::getName)
                             .toList();
                     return new MyPastureResponse(pasture.getPublicId(), pasture.getName(), mine.getId(),
-                            distancePolicy.distanceOf(mine), distancePolicy.pattedToday(mine), edgeFriends);
+                            distancePolicy.distanceOf(mine), distancePolicy.pattedToday(mine),
+                            distancePolicy.isNapping(mine), edgeFriends);
                 })
                 .toList();
     }

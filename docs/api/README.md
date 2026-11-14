@@ -24,6 +24,9 @@
 | 들판 조회 (화면 전체) | GET | `/api/pastures/{pastureId}` | BE-A | 구현됨 |
 | 내 들판 목록 (홈) | GET | `/api/pastures` | BE-A | 구현됨 |
 | F2 쓰다듬기 | POST | `/api/sheep/{sheepId}/pat` | BE-A | 구현됨 |
+| P1 낮잠 모드 (1~7일) | PUT | `/api/sheep/{sheepId}/nap` | BE-A | 구현됨 |
+| P1 낮잠 깨우기 | DELETE | `/api/sheep/{sheepId}/nap` | BE-A | 구현됨 |
+| P1 들판 나가기 | DELETE | `/api/sheep/{sheepId}` | BE-A | 구현됨 |
 | F4 말풍선 올리기 (위험 키워드 검사) | PUT | `/api/sheep/{sheepId}/bubble` | BE-B | 구현됨 |
 | F4 말풍선 지우기 | DELETE | `/api/sheep/{sheepId}/bubble` | BE-B | 구현됨 |
 | F7 목도리 보내기 | POST | `/api/sheep/{sheepId}/scarves` | BE-B | 구현됨 |

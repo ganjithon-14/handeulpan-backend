@@ -39,7 +39,7 @@
   "maxSheep": 6,
   "full": false,
   "sheep": [
-    { "name": "두부", "woolColor": "CREAM", "distance": "CENTER" }
+    { "name": "두부", "woolColor": "CREAM", "distance": "CENTER", "napping": false }
   ]
 }
 ```
@@ -74,8 +74,8 @@
   "maxSheep": 6,
   "mySheepId": 1,
   "sheep": [
-    { "id": 1, "name": "두부", "woolColor": "CREAM", "distance": "CENTER", "mine": true, "pattedToday": true },
-    { "id": 2, "name": "콩이", "woolColor": "MINT", "distance": "EDGE", "mine": false }
+    { "id": 1, "name": "두부", "woolColor": "CREAM", "distance": "CENTER", "mine": true, "pattedToday": true, "napping": false },
+    { "id": 2, "name": "콩이", "woolColor": "MINT", "distance": "EDGE", "mine": false, "napping": false }
   ]
 }
 ```
@@ -86,6 +86,7 @@
 | `distance` | `CENTER` 가운데 / `WALK` 산책 중 / `EDGE` 가장자리 → 친구 화면에 배너(F6) |
 | `mine` | 내 양이면 `true` |
 | `pattedToday` | **내 양에만** 있음. 오늘(Asia/Seoul) 쓰다듬었는지 |
+| `napping` | 낮잠 중이면 `true`. 친구에게도 보임. 끝나는 시각은 내보내지 않음 → [sheep.md](sheep.md) |
 
 - 마지막 쓰다듬은 시각, 접속 시각은 **내보내지 않습니다**. (기획서 9장 감시 방지)
 - 말풍선(`bubble`), 목도리(`wornScarf`, `sentScarfToday`, `myScarves`)는 BE-B 기능이 들어오면 같은 응답에 붙습니다. → [bubble.md](bubble.md), [scarf.md](scarf.md)
@@ -108,6 +109,7 @@
     "mySheepId": 1,
     "myDistance": "CENTER",
     "pattedToday": true,
+    "napping": false,
     "edgeFriendNames": ["콩이"]
   }
 ]

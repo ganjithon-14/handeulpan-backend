@@ -22,8 +22,11 @@ public class SheepFinder {
 
     private final SheepRepository sheepRepository;
 
+    /** 들판을 나간 양은 없는 양으로 취급합니다. */
     public Sheep require(Long sheepId) {
-        return sheepRepository.findById(sheepId).orElseThrow(CoreError.SHEEP_NOT_FOUND::exception);
+        return sheepRepository.findById(sheepId)
+                .filter(Sheep::isActive)
+                .orElseThrow(CoreError.SHEEP_NOT_FOUND::exception);
     }
 
     public Sheep requireMine(User me, Long sheepId) {
@@ -41,7 +44,7 @@ public class SheepFinder {
     }
 
     public Sheep requireMineInSamePasture(User me, Sheep other) {
-        return sheepRepository.findByPastureIdAndUserId(other.getPasture().getId(), me.getId())
+        return sheepRepository.findByPastureIdAndUserIdAndLeftAtIsNull(other.getPasture().getId(), me.getId())
                 .orElseThrow(CoreError.NOT_PASTURE_MEMBER::exception);
     }
 }

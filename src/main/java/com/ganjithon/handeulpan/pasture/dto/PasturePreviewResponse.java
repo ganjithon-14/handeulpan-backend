@@ -12,6 +12,6 @@ public record PasturePreviewResponse(
         boolean full,
         List<PreviewSheep> sheep) {
 
-    public record PreviewSheep(String name, WoolColor woolColor, Distance distance) {
+    public record PreviewSheep(String name, WoolColor woolColor, Distance distance, boolean napping) {
     }
 }
