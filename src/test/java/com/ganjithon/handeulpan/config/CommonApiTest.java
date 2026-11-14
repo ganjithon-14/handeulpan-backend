@@ -79,7 +79,7 @@ class CommonApiTest {
 
     @Test
     void 지원하지_않는_메서드는_405() throws Exception {
-        mvc.perform(get("/api/users"))
+        mvc.perform(get("/api/auth/login"))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
     }
@@ -143,12 +143,17 @@ class CommonApiTest {
                 .andExpect(jsonPath("$.components.securitySchemes.DeviceToken.in").value("header"))
                 // 들판 만들기는 문서에 있고 본문(request body)만 받는다. @CurrentUser User가 파라미터로 끼면 안 된다.
                 .andExpect(jsonPath("$.paths['/api/pastures'].post.requestBody").exists())
-                .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist());
+                .andExpect(jsonPath("$.paths['/api/pastures'].post.parameters").doesNotExist())
+                // 회원 전용: 가입은 문서에 있고(이메일·비밀번호), 토큰만 발급하는 API는 없다.
+                // 양 이름은 가입이 아니라 들판 만들기·합류에서 받는다.
+                .andExpect(jsonPath("$.paths['/api/auth/signup'].post").exists())
+                .andExpect(jsonPath("$.components.schemas.SignupRequest.properties.email").exists())
+                .andExpect(jsonPath("$.components.schemas.SignupRequest.properties.sheepName").doesNotExist())
+                .andExpect(jsonPath("$.paths['/api/users']").doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.JoinPastureRequest.properties.sheepName").exists());
     }
 
     private String issueToken() throws Exception {
-        String body = mvc.perform(post("/api/users")).andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        return JsonPath.read(body, "$.deviceToken");
+        return com.ganjithon.handeulpan.support.TestUsers.signupNew(mvc);
     }
 }
