@@ -131,5 +131,9 @@ public class Sheep {
     /** 데모 모드 전용: 마지막 쓰다듬은 시각을 과거로 되감습니다. */
     public void rewind(Duration duration) {
         this.lastPattedAt = lastPattedAt.minus(duration);
+        // 시간을 되돌리는 것이므로 낮잠 끝 시각도 같이 당깁니다. 안 그러면 낮잠을 쓴 양은 되감기가 거리에 반영되지 않습니다.
+        if (napUntil != null) {
+            this.napUntil = napUntil.minus(duration);
+        }
     }
 }

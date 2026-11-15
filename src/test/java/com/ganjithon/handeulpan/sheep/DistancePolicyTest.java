@@ -93,4 +93,26 @@ class DistancePolicyTest {
 
         assertThat(policyAt(fiveDays.plus(Duration.ofDays(1))).distanceOf(sheep)).isEqualTo(Distance.CENTER);
     }
+
+    @Test
+    void 낮잠이_끝난_양도_데모_되감기가_거리에_반영된다() {
+        Sheep sheep = sheepPattedAt(last);
+        sheep.startNap(last.plus(Duration.ofDays(3)));
+        Instant fourDays = last.plus(Duration.ofDays(4)); // 낮잠이 끝난 뒤
+
+        assertThat(policyAt(fourDays).distanceOf(sheep)).isEqualTo(Distance.CENTER);
+        sheep.rewind(Duration.ofDays(4));
+        assertThat(policyAt(fourDays).distanceOf(sheep)).isEqualTo(Distance.EDGE);
+    }
+
+    @Test
+    void 낮잠_중에_되감으면_그만큼_낮잠이_일찍_끝난다() {
+        Sheep sheep = sheepPattedAt(last);
+        sheep.startNap(last.plus(Duration.ofDays(7)));
+        Instant twoDays = last.plus(Duration.ofDays(2));
+
+        assertThat(policyAt(twoDays).isNapping(sheep)).isTrue();
+        sheep.rewind(Duration.ofDays(6)); // 낮잠 끝 = 1일째로 당겨짐
+        assertThat(policyAt(twoDays).isNapping(sheep)).isFalse();
+    }
 }
