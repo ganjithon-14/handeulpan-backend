@@ -95,7 +95,8 @@ class CoreLoopApiTest {
         mvc.perform(get("/api/pastures").header("X-Device-Token", friend))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].pastureId").value(pastureId))
-                .andExpect(jsonPath("$[0].edgeFriendNames[0]").value("두부"));
+                .andExpect(jsonPath("$[0].edgeFriendNames[0]").value("두부"))
+                .andExpect(jsonPath("$[0].sheepCount").value(2));
 
         String dubuSheep = JsonPath.read(mvc.perform(get("/api/pastures/{id}", pastureId)
                 .header("X-Device-Token", dubu)).andReturn().getResponse().getContentAsString(), "$.mySheepId").toString();
