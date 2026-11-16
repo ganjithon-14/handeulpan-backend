@@ -110,10 +110,12 @@
     "myDistance": "CENTER",
     "pattedToday": true,
     "napping": false,
+    "sheepCount": 2,
     "edgeFriendNames": ["콩이"]
   }
 ]
 ```
+`sheepCount`: 지금 들판에 사는 양 수(나간 양 제외, 내 양 포함). 홈 카드의 "n마리의 양이 함께 있어요"에 씁니다. 미리보기 API를 따로 부를 필요가 없습니다.
 `edgeFriendNames`: 가장자리에 간 친구 양 이름. 앱을 열 때 "콩이 양이 조금 멀리 갔어요. 연락해볼까요?" 배너에 씁니다.
 
 ---

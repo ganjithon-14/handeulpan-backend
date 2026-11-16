@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * 홈(내 들판 목록) 한 줄.
  * napping: 내 양이 낮잠 중인지
+ * sheepCount: 지금 들판에 사는 양 수 (나간 양 제외, 내 양 포함)
  * edgeFriendNames: 가장자리에 있는 친구 양 이름 — 앱을 열 때 "두부 양이 조금 멀리 갔어요" 배너용 (F6)
  */
 public record MyPastureResponse(
@@ -15,5 +16,6 @@ public record MyPastureResponse(
         Distance myDistance,
         boolean pattedToday,
         boolean napping,
+        int sheepCount,
         List<String> edgeFriendNames) {
 }

@@ -118,14 +118,15 @@ public class PastureService {
         return sheepRepository.findAllOfUser(me.getId()).stream()
                 .map(mine -> {
                     Pasture pasture = mine.getPasture();
-                    List<String> edgeFriends = sheepRepository.findAllInPasture(pasture.getId()).stream()
+                    List<Sheep> inPasture = sheepRepository.findAllInPasture(pasture.getId());
+                    List<String> edgeFriends = inPasture.stream()
                             .filter(s -> !s.isOwnedBy(me))
                             .filter(s -> distancePolicy.distanceOf(s) == Distance.EDGE)
                             .map(Sheep::getName)
                             .toList();
                     return new MyPastureResponse(pasture.getPublicId(), pasture.getName(), mine.getId(),
                             distancePolicy.distanceOf(mine), distancePolicy.pattedToday(mine),
-                            distancePolicy.isNapping(mine), edgeFriends);
+                            distancePolicy.isNapping(mine), inPasture.size(), edgeFriends);
                 })
                 .toList();
     }

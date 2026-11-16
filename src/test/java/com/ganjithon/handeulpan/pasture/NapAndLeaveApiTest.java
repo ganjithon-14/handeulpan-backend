@@ -170,6 +170,9 @@ class NapAndLeaveApiTest {
                 .andExpect(jsonPath("$.sheep.length()").value(1));
         mvc.perform(get("/api/pastures").header("X-Device-Token", friend))
                 .andExpect(jsonPath("$.length()").value(0));
+        // 남은 사람의 홈에서도 양 수는 나간 양을 뺀 값
+        mvc.perform(get("/api/pastures").header("X-Device-Token", dubu))
+                .andExpect(jsonPath("$[0].sheepCount").value(1));
         mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", friend))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("NOT_PASTURE_MEMBER"));
