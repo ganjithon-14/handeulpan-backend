@@ -29,7 +29,7 @@ public class DemoService {
         return new RewindResponse(sheep.getId(), distancePolicy.distanceOf(sheep));
     }
 
-    private void checkKey(String demoKey) {
+    void checkKey(String demoKey) {
         String expected = properties.key();
         if (!StringUtils.hasText(expected) || demoKey == null
                 || !MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),

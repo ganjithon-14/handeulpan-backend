@@ -32,6 +32,8 @@
 | F7 목도리 보내기 | POST | `/api/sheep/{sheepId}/scarves` | BE-B | 구현됨 |
 | F7 목도리 두르기·벗기 (받은 목록은 들판 조회의 `myScarves`) | PUT | `/api/sheep/{sheepId}/scarf` | BE-B | 구현됨 |
 | D 데모 되감기 (`X-Demo-Key`) | POST | `/api/demo/sheep/{sheepId}/rewind` | BE-A | 구현됨 |
+| D 시연 데이터 만들기·초기화 (`X-Demo-Key`) | POST | `/api/demo/seed` | BE-B | 구현됨 |
+| D 시연 데이터 지우기 (`X-Demo-Key`) | DELETE | `/api/demo/seed` | BE-B | 구현됨 |
 
 말풍선·목도리 경로는 구현된 경로입니다.
 
@@ -45,5 +47,5 @@ docs/api/
   sheep.md      # F2 쓰다듬기
   bubble.md     # F4 말풍선
   scarf.md      # F7 목도리
-  demo.md       # D 데모 되감기
+  demo.md       # D 데모 되감기·시연 데이터
 ```

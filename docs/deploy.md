@@ -41,6 +41,19 @@ git pull
 docker compose up -d --build
 ```
 
+## 시연 전 데이터 초기화
+
+시연용 계정·들판은 API 한 번으로 만듭니다. (데모 키는 서버 `.env`의 `HANDEULPAN_DEMO_KEY`)
+
+```bash
+curl -X POST https://{DOMAIN}/api/demo/seed -H 'X-Demo-Key: {HANDEULPAN_DEMO_KEY}'
+```
+
+- 이미 있으면 지우고 같은 상태로 다시 만듭니다. 시연 직전에 한 번 부르면 되고, 시연 도중 꼬이면 다시 불러도 됩니다.
+- 응답의 `members`에서 `me: true`인 계정으로 로그인합니다. 비밀번호는 응답의 `password`입니다. 구성은 [docs/api/demo.md](api/demo.md)를 봅니다.
+- 시연이 끝나면 `DELETE /api/demo/seed`(같은 헤더)로 지웁니다.
+- 위 확인 때 만든 `check@example.com` 같은 임시 계정은 이 API가 지우지 않으니 DB에서 직접 지웁니다.
+
 ## 주의
 
 - `SPRING_PROFILES_ACTIVE=prod`는 compose에 이미 들어 있습니다. 빠지면 앱이 H2(메모리 DB)와 공개된 데모 키(`local-demo`)로 뜹니다.
