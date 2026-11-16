@@ -36,30 +36,38 @@
   "password": "demo1234!",
   "members": [
     { "email": "doobu@demo.test", "sheepName": "두부", "sheepId": 1, "distance": "CENTER", "napping": false, "me": true },
-    { "email": "kong@demo.test",  "sheepName": "콩이", "sheepId": 2, "distance": "CENTER", "napping": false, "me": false }
+    { "email": "kong@demo.test",  "sheepName": "콩이", "sheepId": 2, "distance": "CENTER", "napping": false, "me": false },
+    ...
   ]
 }
 ```
 
-모든 데모 계정의 비밀번호는 `password` 값 하나입니다. 로그인은 평소처럼 `POST /api/auth/login`으로 합니다. (`me: true`가 시연 시작 계정)
+모든 데모 계정의 비밀번호는 `password` 값 하나입니다. 로그인은 평소처럼 `POST /api/auth/login`으로 합니다.
+
+기획서 7장 시연 시나리오 A→B→C의 **시작 상태**입니다. (동기 4명, 폰 3대에 친구 양을 띄움)
 
 | 양 | 이메일 | 털 색 | 상태 |
 |---|---|---|---|
-| 두부 (나) | `doobu@demo.test` | CREAM | 가운데. 친구 셋에게 목도리를 받았고 콩이(MINT)의 것을 두름 |
-| 콩이 | `kong@demo.test` | MINT | 가운데. 말풍선 "시험 끝났다!". **되감기로 멀어지는 모습을 보여 줄 양** |
-| 보리 | `bori@demo.test` | YELLOW | 산책 중 (3일 전에 쓰다듬음) |
-| 별이 | `byeol@demo.test` | LAVENDER | 낮잠 중 (3일) |
-| 구름 | `cloud@demo.test` | SKY | 가운데. 말풍선 "오늘도 맑음" |
+| 두부 | `doobu@demo.test` | CREAM | 가운데. 말풍선 "요즘 좀 지침"(위험 표시). 시연에서 가장자리로 보낼 양 (`me: true`) |
+| 콩이 | `kong@demo.test` | MINT | 가운데. 말풍선 "오늘 입사 100일" |
+| 보리 | `bori@demo.test` | PINK | 가운데 |
+| 별이 | `byeol@demo.test` | YELLOW | 가운데 |
 
-- 양은 5마리라 **한 자리가 비어 있습니다.** 링크(`/p/{pastureId}`)로 합류하는 장면을 보여 줄 수 있습니다.
-- 두부가 아직 아무에게도 목도리를 보내지 않은 상태라, 시연에서 바로 보낼 수 있습니다.
-- 이름·털 색·말풍선·시나리오를 바꾸려면 `DemoSeedService`를 고칩니다.
+- 양은 4마리라 **두 자리가 비어 있습니다.** 링크(`/p/{pastureId}`)로 합류하는 장면을 보여 줄 수 있습니다.
+- **목도리는 하나도 보내 두지 않았습니다.** B에서 친구 셋이 직접 보내고, C에서 두부가 받은 것 중 민트색을 고르는 장면을 그대로 보여 주기 위해서입니다.
+- 말풍선은 24시간 뒤 사라집니다. 시연 직전에 이 API를 부르세요.
+- 이름·털 색·말풍선을 바꾸려면 `DemoSeedService`를 고칩니다.
+
+시연 흐름
+1. **A** 친구들 폰으로 로그인해 들판을 보여 주고, 쓰다듬기·말풍선을 보여 줍니다.
+2. **B** 두부를 4일 되감기(`POST /api/demo/sheep/{두부 sheepId}/rewind` `{"days":4}`)하면 친구들 홈에 "두부 양이 조금 멀리 갔어요" 배너가 뜹니다. 친구 셋이 각자 목도리를 보냅니다.
+3. **C** 두부로 로그인하면 받은 목도리 셋이 보이고, 민트색을 골라 두른 뒤 쓰다듬으면 가운데로 돌아옵니다.
+
+시연을 다시 하려면 이 API를 한 번 더 부르면 처음 상태로 돌아갑니다.
 
 | HTTP | code | 언제 |
 |---|---|---|
 | 403 | `INVALID_DEMO_KEY` | 키가 없거나 틀림, 또는 서버에 데모 키가 설정되지 않음 |
-
-시연 흐름 예: 두부로 로그인 → 홈에서 들판 확인 → 콩이를 4일 되감기(`/rewind` `{"days":4}`) → 두부 홈에 "콩이 양이 조금 멀리 갔어요" 배너 → 두부가 콩이를 쓰다듬고 목도리를 보냄.
 
 ## DELETE /api/demo/seed — 시연 데이터 지우기
 

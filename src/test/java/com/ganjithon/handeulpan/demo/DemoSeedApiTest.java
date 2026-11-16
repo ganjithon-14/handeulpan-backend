@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,45 +58,75 @@ class DemoSeedApiTest {
     }
 
     @Test
-    void 시드를_부르면_시연_상태의_들판이_만들어진다() throws Exception {
+    void 시드를_부르면_시나리오_A의_시작_상태가_만들어진다() throws Exception {
         String body = seed().andExpect(status().isCreated())
                 .andExpect(jsonPath("$.password").value(PASSWORD))
-                .andExpect(jsonPath("$.members.length()").value(5))
+                .andExpect(jsonPath("$.members.length()").value(4))
                 .andExpect(jsonPath("$.members[?(@.me == true)].email").value("doobu@demo.test"))
                 .andReturn().getResponse().getContentAsString();
         String pastureId = JsonPath.read(body, "$.pastureId");
 
-        String dubu = login("doobu@demo.test");
-        mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", dubu))
+        String kong = login("kong@demo.test");
+        mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", kong))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("한 들판 데모"))
-                .andExpect(jsonPath("$.sheep.length()").value(5))
-                .andExpect(jsonPath("$.sheep[?(@.name == '두부')].mine").value(true))
-                .andExpect(jsonPath("$.sheep[?(@.name == '두부')].distance").value("CENTER"))
-                .andExpect(jsonPath("$.sheep[?(@.name == '콩이')].distance").value("CENTER"))
-                .andExpect(jsonPath("$.sheep[?(@.name == '콩이')].bubble.text").value("시험 끝났다!"))
-                .andExpect(jsonPath("$.sheep[?(@.name == '보리')].distance").value("WALK"))
-                .andExpect(jsonPath("$.sheep[?(@.name == '별이')].napping").value(true))
-                .andExpect(jsonPath("$.sheep[?(@.name == '별이')].distance").value("CENTER"))
-                // 두부는 친구 세 명에게 목도리를 받았고, 마지막에 받은 콩이(MINT) 것을 두르고 있다
-                .andExpect(jsonPath("$.sheep[?(@.name == '두부')].wornScarf").value("MINT"))
-                .andExpect(jsonPath("$.myScarves.length()").value(3));
-        // 홈: 배너에 뜰 친구는 아직 없다. (양 5마리라 한 자리가 비어 있다)
-        mvc.perform(get("/api/pastures").header("X-Device-Token", dubu))
+                .andExpect(jsonPath("$.sheep.length()").value(4))
+                .andExpect(jsonPath("$.sheep[?(@.name == '콩이')].mine").value(true))
+                .andExpect(jsonPath("$.sheep[?(@.name == '두부')].woolColor").value("CREAM"))
+                .andExpect(jsonPath("$.sheep[?(@.name == '콩이')].woolColor").value("MINT"))
+                .andExpect(jsonPath("$.sheep[?(@.name == '보리')].woolColor").value("PINK"))
+                .andExpect(jsonPath("$.sheep[?(@.name == '별이')].woolColor").value("YELLOW"))
+                // 모두 가운데에서 시작하고, 목도리는 아직 아무도 보내지 않았다
+                .andExpect(jsonPath("$.sheep[?(@.distance != 'CENTER')]").isEmpty())
+                .andExpect(jsonPath("$.sheep[?(@.wornScarf != null)]").isEmpty())
+                .andExpect(jsonPath("$.myScarves.length()").value(0))
+                .andExpect(jsonPath("$.sheep[?(@.name == '두부')].bubble.text").value("요즘 좀 지침"))
+                .andExpect(jsonPath("$.sheep[?(@.name == '두부')].bubble.flagged").value(true))
+                .andExpect(jsonPath("$.sheep[?(@.name == '콩이')].bubble.text").value("오늘 입사 100일"))
+                .andExpect(jsonPath("$.sheep[?(@.name == '콩이')].bubble.flagged").value(false));
+        // 두 자리가 비어 있어서 링크로 합류하는 장면을 보여 줄 수 있다
+        mvc.perform(get("/api/pastures/{id}/preview", pastureId))
+                .andExpect(jsonPath("$.full").value(false));
+        mvc.perform(get("/api/pastures").header("X-Device-Token", kong))
                 .andExpect(jsonPath("$[0].edgeFriendNames.length()").value(0));
     }
 
     @Test
-    void 되감기로_콩이를_가장자리로_보내면_두부_홈에_배너가_뜬다() throws Exception {
+    void 시나리오_A_B_C를_그대로_재현할_수_있다() throws Exception {
         String body = seed().andReturn().getResponse().getContentAsString();
-        Number kongSheep = ((List<Number>) JsonPath.read(body, "$.members[?(@.sheepName == '콩이')].sheepId")).get(0);
+        String pastureId = JsonPath.read(body, "$.pastureId");
+        long dubuSheep = sheepId(body, "두부");
+        String dubu = login("doobu@demo.test");
+        String kong = login("kong@demo.test");
+        String bori = login("bori@demo.test");
+        String byeol = login("byeol@demo.test");
 
-        mvc.perform(post("/api/demo/sheep/{id}/rewind", kongSheep.longValue())
+        // B: 두부가 나흘간 접속하지 않음 → 가장자리, 친구 셋의 홈에 배너가 뜬다
+        mvc.perform(post("/api/demo/sheep/{id}/rewind", dubuSheep)
                         .header("X-Demo-Key", KEY).contentType(MediaType.APPLICATION_JSON).content("{\"days\": 4}"))
                 .andExpect(jsonPath("$.distance").value("EDGE"));
+        for (String friend : List.of(kong, bori, byeol)) {
+            mvc.perform(get("/api/pastures").header("X-Device-Token", friend))
+                    .andExpect(jsonPath("$[0].edgeFriendNames[0]").value("두부"));
+        }
+        // 친구 셋이 각자 목도리를 보낸다
+        for (String friend : List.of(kong, bori, byeol)) {
+            mvc.perform(post("/api/sheep/{id}/scarves", dubuSheep).header("X-Device-Token", friend))
+                    .andExpect(status().isCreated());
+        }
 
-        mvc.perform(get("/api/pastures").header("X-Device-Token", login("doobu@demo.test")))
-                .andExpect(jsonPath("$[0].edgeFriendNames[0]").value("콩이"));
+        // C: 두부가 돌아와 받은 목도리 셋 중 민트색을 골라 두르고, 쓰다듬으면 가운데로 돌아온다
+        String view = mvc.perform(get("/api/pastures/{id}", pastureId).header("X-Device-Token", dubu))
+                .andExpect(jsonPath("$.myScarves.length()").value(3))
+                .andReturn().getResponse().getContentAsString();
+        Number mintScarf = ((List<Number>) JsonPath.read(view, "$.myScarves[?(@.color == 'MINT')].id")).get(0);
+        mvc.perform(put("/api/sheep/{id}/scarf", dubuSheep).header("X-Device-Token", dubu)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"scarfId\": " + mintScarf + "}"))
+                .andExpect(jsonPath("$.wornScarf").value("MINT"));
+        mvc.perform(post("/api/sheep/{id}/pat", dubuSheep).header("X-Device-Token", dubu))
+                .andExpect(jsonPath("$.distance").value("CENTER"));
+        mvc.perform(get("/api/pastures").header("X-Device-Token", kong))
+                .andExpect(jsonPath("$[0].edgeFriendNames.length()").value(0));
     }
 
     @Test
@@ -144,6 +175,11 @@ class DemoSeedApiTest {
     }
 
     // ---------- helpers ----------
+
+    private static long sheepId(String seedBody, String sheepName) {
+        return ((List<Number>) JsonPath.read(seedBody, "$.members[?(@.sheepName == '" + sheepName + "')].sheepId"))
+                .get(0).longValue();
+    }
 
     private ResultActions seed() throws Exception {
         return mvc.perform(post("/api/demo/seed").header("X-Demo-Key", KEY));

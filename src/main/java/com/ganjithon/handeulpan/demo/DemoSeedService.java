@@ -7,7 +7,6 @@ import com.ganjithon.handeulpan.bubble.BubbleRepository;
 import com.ganjithon.handeulpan.pasture.PastureService;
 import com.ganjithon.handeulpan.pasture.dto.CreatePastureRequest;
 import com.ganjithon.handeulpan.pasture.dto.JoinPastureRequest;
-import com.ganjithon.handeulpan.scarf.ScarfService;
 import com.ganjithon.handeulpan.sheep.Distance;
 import com.ganjithon.handeulpan.sheep.DistancePolicy;
 import com.ganjithon.handeulpan.sheep.Sheep;
@@ -17,7 +16,6 @@ import com.ganjithon.handeulpan.user.User;
 import com.ganjithon.handeulpan.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +30,17 @@ import org.springframework.transaction.annotation.Transactional;
  * 목도리 두르기 등)이 적용됩니다. 데모 계정은 이메일이 {@value #EMAIL_DOMAIN}으로 끝나는 것만이고,
  * 정리할 때도 이 계정과 그 들판만 지웁니다.
  *
+ * <p>기획서 7장 시연 시나리오(A→B→C)의 시작 상태입니다. 폰 3대에 친구 양을 띄우고, 두부는 다른 기기에서 씁니다.
  * <pre>
- * 두부(나)  CREAM    가운데  — 시연에서 로그인하는 계정. 친구들의 목도리를 받아 둔 상태
- * 콩이      MINT     가운데  — 말풍선 있음. 되감기(POST /api/demo/sheep/{id}/rewind)로 멀어지는 모습을 보여 줄 양
- * 보리      YELLOW   산책    — 3일 전에 쓰다듬음
- * 별이      LAVENDER 낮잠    — 3일간 낮잠 중
- * 구름      SKY      가운데  — 말풍선 있음
- * (빈자리 1칸)                — 링크로 합류하는 장면용
+ * 두부   CREAM  가운데 — 말풍선 "요즘 좀 지침"(위험 표시). 시연에서 4일 되감기로 가장자리로 보낼 양
+ * 콩이   MINT   가운데 — 말풍선 "오늘 입사 100일"
+ * 보리   PINK   가운데
+ * 별이   YELLOW 가운데
+ * (빈자리 2칸)          — 링크로 합류하는 장면용
  * </pre>
+ *
+ * <p>목도리는 일부러 하나도 보내 두지 않습니다. B에서 친구 셋이 직접 보내고, C에서 두부가 받은 것 중
+ * 민트색을 골라 두르는 장면이 시연의 핵심이기 때문입니다. 말풍선은 24시간 뒤 사라지므로 시연 직전에 만드세요.
  */
 @Service
 @RequiredArgsConstructor
@@ -52,7 +53,6 @@ public class DemoSeedService {
     private final DemoService demoService;
     private final AuthService authService;
     private final PastureService pastureService;
-    private final ScarfService scarfService;
     private final UserRepository userRepository;
     private final SheepRepository sheepRepository;
     private final BubbleRepository bubbleRepository;
@@ -71,29 +71,19 @@ public class DemoSeedService {
         Member kong = signup("kong", "콩이");
         Member bori = signup("bori", "보리");
         Member byeol = signup("byeol", "별이");
-        Member cloud = signup("cloud", "구름");
 
         String pastureId = pastureService.create(dubu.user,
                 new CreatePastureRequest(PASTURE_NAME, "두부", WoolColor.CREAM, true)).pastureId();
         dubu.sheepId = sheepIdOf(pastureId, dubu);
         join(pastureId, kong, WoolColor.MINT);
-        join(pastureId, bori, WoolColor.YELLOW);
-        join(pastureId, byeol, WoolColor.LAVENDER);
-        join(pastureId, cloud, WoolColor.SKY);
+        join(pastureId, bori, WoolColor.PINK);
+        join(pastureId, byeol, WoolColor.YELLOW);
 
-        bubble(kong, "시험 끝났다!", now);
-        bubble(cloud, "오늘도 맑음", now);
-
-        sheep(bori).rewind(Duration.ofDays(3));          // 산책 중
-        sheep(byeol).startNap(now.plus(Duration.ofDays(3))); // 낮잠 중
-
-        // 두부는 친구들에게 목도리를 받아 둔 상태. 마지막에 받은 콩이(MINT) 목도리를 두르고 있습니다.
-        scarfService.send(bori.user, dubu.sheepId);
-        scarfService.send(byeol.user, dubu.sheepId);
-        scarfService.send(kong.user, dubu.sheepId);
+        bubble(dubu, "요즘 좀 지침", true, now);
+        bubble(kong, "오늘 입사 100일", false, now);
 
         List<SeedMember> members = new ArrayList<>();
-        for (Member m : List.of(dubu, kong, bori, byeol, cloud)) {
+        for (Member m : List.of(dubu, kong, bori, byeol)) {
             Sheep s = sheep(m);
             members.add(new SeedMember(m.email(), s.getName(), s.getId(), distancePolicy.distanceOf(s),
                     distancePolicy.isNapping(s), m == dubu));
@@ -172,8 +162,8 @@ public class DemoSeedService {
         return sheepRepository.findById(member.sheepId).orElseThrow();
     }
 
-    private void bubble(Member member, String text, Instant now) {
-        bubbleRepository.save(new Bubble(sheep(member), text, false, now));
+    private void bubble(Member member, String text, boolean flagged, Instant now) {
+        bubbleRepository.save(new Bubble(sheep(member), text, flagged, now));
     }
 
     private static final class Member {
